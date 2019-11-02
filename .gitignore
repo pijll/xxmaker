@@ -1,0 +1,6 @@
+bin/nonfree
+lib/__pycache__
+graphics/nonfree
+venv
+.idea
+*.pdf
