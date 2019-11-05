@@ -8,6 +8,9 @@ tan = (1, 1, 0.8)
 lightgreen = (.7, 1, .7)
 red = (1, 0, 0)
 blue = (0, 0, 1)
+brown = (0.3, 0.3, 0)
+lightblue = (.5, .5, 1)
+orange = (1, 0.5, 0)
 
 phase_1 = yellow
 phase_2 = green

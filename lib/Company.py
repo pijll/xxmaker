@@ -9,16 +9,21 @@ logo_radius = 5.5*mm
 
 
 class Company:
-    def __init__(self, name, abbreviation, colour, n_stations, num_shares=10, logo=None):
+    token_costs_default = ['', 40, 100]
+    token_interspace = 4*mm
+
+    def __init__(self, name, abbreviation, colour, n_stations, num_shares=10, logo=None, token_costs=None):
         self.name = name
         self.abbreviation = abbreviation
         self.colour = colour
         self.n_stations = n_stations
         self.num_shares = num_shares
+        self.token_costs = token_costs
         if logo:
             self.logo = self._make_logo_from_image('../../../graphics/companies/' + logo, radius=logo_radius)
         else:
             self.logo = self._make_logo_from_abbrev(self.abbreviation, radius=logo_radius)
+        self.game = None
 
     def charter(self):
         width = 130 * mm
@@ -51,16 +56,21 @@ class Company:
         c.rectangle(margin, margin, width - 2*margin, height - 2*margin)
         c.stroke()
 
-        c.set_line_width(0.6*mm)
-        c.move_to(margin + width_train_section, margin + height_namebar)
-        c.line_to(margin + width_train_section, height - margin)
-        c.move_to(margin, margin + height_namebar + height_tokenbar)
-        c.rel_line_to(width_train_section, 0)
-        c.stroke()
-
+        token_costs = self.token_costs or self.token_costs_default
         for i in range(self.n_stations):
-            c.arc(margin + (i+1)*3*logo_radius, margin+height_namebar+height_tokenbar/2, logo_radius, 0, 6.29)
+            c.set_line_width(0.6*mm)
+            x = margin + self.token_interspace*(i+1) + logo_radius*(2*i + 1)
+            y = margin + height_namebar + self.token_interspace + logo_radius
+            c.arc(x, y, logo_radius, 0, 6.29)
             c.stroke()
+
+            try:
+                token_cost = token_costs[i]
+            except IndexError:
+                token_cost = token_costs[-1]
+            if token_cost:
+                Output.draw_text(f'{self.game.currency}{token_cost}', 'FreeSans', 8, c, x, y+logo_radius, 'top', 'center')
+                c.stroke()
 
         return charter
 
@@ -108,7 +118,7 @@ class Company:
         context.set_source_rgb(*Colour.white)
         context.arc(radius, radius, radius, 0, 6.29)
         context.fill()
-        Output.load_image(logo_file, context, radius, radius, radius*1.9, radius*1.9)
+        Output.load_image(logo_file, context, radius, radius, radius * 1.9, radius * 1.9, circle_clip=True)
         return surface
 
     def _make_logo_from_abbrev(self, abbreviation, radius):

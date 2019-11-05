@@ -2,7 +2,7 @@
 
 
 class Game:
-    def __init__(self, name):
+    def __init__(self, name, author, currency=''):
         self.name = name
         self.companies = {}
         self.trains = []
@@ -10,6 +10,8 @@ class Game:
         self.tiles = []
         self.maps = []
         self.stockmarket = None
+        self.author = author
+        self.currency = currency
 #        self.tilesize = 38*mm   # side to side
 
     def add_company(self, company):

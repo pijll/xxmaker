@@ -17,8 +17,10 @@ row_letters = [char for char in ".ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
 
 
 class Map:
-    def __init__(self, direction):
-        self.direction = direction
+    margin = 10*mm
+
+    def __init__(self, orientation):
+        self.orientation = orientation
         self.hexags = dict()
         self.game = None
 
@@ -26,6 +28,7 @@ class Map:
         row, column = coords_to_rowcolumn(coords)
         self.hexags[row, column] = hexag or Hexag.empty
         self.hexags[row, column].map = self
+        self.hexags[row, column].orientation = self.orientation
 
     def width_in_hexags(self):
         return max(column for row, column in self.hexags.keys())
@@ -34,36 +37,40 @@ class Map:
         return max(row for row, column in self.hexags.keys())
 
     def width(self):
-        if self.direction == Hexag.VERTICAL:
-            return (self.width_in_hexags() * 1.5 + 3.5) * s
+        if self.orientation == Hexag.VERTICAL:
+            return (self.width_in_hexags() * 1.5 + 1.5) * s + 2*self.margin
         else:
-            return 200*mm
+            return (self.width_in_hexags()/2 + 1) * hexag_size + 2*self.margin
 
     def height(self):
-        if self.direction == Hexag.VERTICAL:
-            return (self.height_in_hexags()/2 + .5) * hexag_size
+        if self.orientation == Hexag.VERTICAL:
+            return (self.height_in_hexags()/2 + .5) * hexag_size + 2*self.margin
         else:
-            return 200*mm
+            return (self.height_in_hexags() * 1.5 + 1.5) * s + 2*self.margin
 
     def paper(self):
         paper = Paper.Paper(self.width(), self.height())
         for (row, column), hexag in self.hexags.items():
             x, y = self.position_of_hexag(row, column)
 
-            paper.context.set_source_surface(hexag.draw(), x, y)
+            paper.context.set_source_surface(hexag.draw(), int(x), y)
             paper.context.paint()
 
-        Output.draw_text(self.game.name, 'Sancreek', 40, paper.context, 20, 20)
+        paper.context.set_source_rgb(*Colour.black)
+        Output.draw_text(self.game.name, 'Sancreek', 40, paper.context, 30, 20)
+        if self.game.author:
+            Output.draw_text(self.game.author, 'FreeSans', 10, paper.context, 100, 20)
+        paper.context.stroke()
 
         return paper
 
     def position_of_hexag(self, row, column):
-        if self.direction == Hexag.VERTICAL:
-            y = row * hexag_size / 2
-            x = column * 1.5 * s
+        if self.orientation == Hexag.VERTICAL:
+            y = row * hexag_size / 2 + self.margin
+            x = column * 1.5 * s + self.margin
         else:
-            y = row * 1.5 * s
-            x = column * hexag_size / 2
+            y = row * 1.5 * s + self.margin
+            x = column * hexag_size / 2 + self.margin
         return x, y
 
 

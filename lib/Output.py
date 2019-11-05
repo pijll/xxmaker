@@ -3,6 +3,8 @@ import Paper
 import collections
 from gi.repository import Pango, PangoCairo
 import math
+from Definitions import *
+import subprocess
 
 
 A4_WIDTH_IN_MM = 210
@@ -11,12 +13,6 @@ A4_HEIGHT_IN_MM = 297
 A4_WIDTH_IN_PT = int(A4_WIDTH_IN_MM / 25.4 * 72)
 A4_HEIGHT_IN_PT = int(A4_HEIGHT_IN_MM / 25.4 * 72)
 
-
-inch = 72
-mm = inch/25.4
-
-LANDSCAPE = 1
-PORTRAIT = 2
 
 
 class PaperTooLargeException(BaseException):
@@ -160,7 +156,6 @@ class Output:
                 papers_by_dimension[(paper.width, paper.height)].append(paper)
             else:
                 paper_parts = list(Page.split_too_large_paper(paper))
-                print(len(paper_parts))
                 papers_by_dimension[(paper_parts[0].width, paper_parts[0].height)] += paper_parts
 
         for (width, height), paper_list in papers_by_dimension.items():
@@ -191,13 +186,14 @@ class Output:
             current_x_left += tile.width
 
         self.surface.finish()
+        subprocess.run(['ps2pdf', 'out.ps'])
 
     def create_pdf_surface(self):
-        self.surface = cairo.PDFSurface("out.pdf", A4_WIDTH_IN_PT, A4_HEIGHT_IN_PT)
+        self.surface = cairo.PSSurface("out.ps", A4_WIDTH_IN_PT, A4_HEIGHT_IN_PT)
         self.context = cairo.Context(self.surface)
 
 
-def load_image(filename, context, x_c, y_c, width, height):
+def load_image(filename, context, x_c, y_c, width, height, circle_clip=False):
     try:
         image = cairo.ImageSurface.create_from_png(filename)
     except cairo.Error:
@@ -212,6 +208,9 @@ def load_image(filename, context, x_c, y_c, width, height):
     context.save()
     context.scale(scale, scale)
     context.set_source_surface(image, x_c/scale - img_width/2, y_c/scale - img_height/2)
+    if circle_clip:
+        context.arc(x_c/scale, y_c/scale, max(img_width, img_height)/2, 0, 6.29)
+        context.clip()
     context.paint()
     context.restore()
 

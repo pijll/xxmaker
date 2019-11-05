@@ -1,6 +1,7 @@
 bin/nonfree
 lib/__pycache__
-graphics/nonfree
+graphics/companies/nonfree
 venv
 .idea
 *.pdf
+*.ps

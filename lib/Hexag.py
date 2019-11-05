@@ -1,5 +1,5 @@
 import Output
-from Output import mm
+from Definitions import *
 import math
 from math import sqrt, pi
 
@@ -10,38 +10,61 @@ import Company
 
 
 hexag_size = 40*mm      # edge to edge
-HORIZONTAL = object()
-VERTICAL = object()
+
 
 class Hexag:
-    def __init__(self, *args, colour=None, size=None, outline=True, text=None):
+    def __init__(self, *args, colour=None, size=None, outline=True, label=None, label_location=None,
+                 orientation=None, border=None, cost=None):
         self.size = size or hexag_size
         self.surface = None
         self.context = None
         self.colour = colour or Colour.lightgreen
         self.outline = outline
-        self.text = text
+        self.label = label
+        self.label_location = label_location
+        self.cost = cost
+        self.orientation = orientation
+        self.border = border
 
-        self.cities = []
+        self.revenuelocations = []
         self.connections = []
         for arg in args:
-            if isinstance(arg, City.City):
-                self.cities.append(arg)
+            if isinstance(arg, City.RevenueLocation):
+                self.revenuelocations.append(arg)
             elif isinstance(arg, Connect):
                 self.connections.append(arg)
+                self.revenuelocations += arg.revenuelocations
         self.map = None
 
     @property
-    def radius(self):
+    def unit_length(self):
+        return self.size/2
+
+    @property
+    def side_length(self):
         return self.size/sqrt(3)
 
     @property
     def width(self):
-        return 2 * self.radius
+        if self.orientation == HORIZONTAL:
+            return self.size
+        else:
+            return 2 * self.side_length
 
     @property
     def height(self):
-        return self.size
+        if self.orientation == VERTICAL:
+            return self.size
+        else:
+            return 2* self.side_length
+
+    def vertices(self):
+        h = self.unit_length
+        s = self.side_length
+        if self.orientation == VERTICAL:
+            return [(-s/2, -h), (s/2, -h), (s, 0), (s/2, h), (-s/2, h), (-s, 0)]
+        else:
+            return [(0, s), (h, s/2), (h, -s/2), (0, -s), (-h, -s/2), (-h, s/2)]
 
     def draw(self):
         if self.surface:
@@ -50,32 +73,15 @@ class Hexag:
         self.surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(-self.width, -self.height,
                                                                                          2*self.width, 2*self.height))
         self.context = cairo.Context(self.surface)
+        c = self.context
 
-        h = self.height/2
-        s = self.radius
-        point = {
-            'C': (0, 0),    # centre
-            '1': (-s/2, -h),  # vertices
-            '2': (s/2, -h),
-            '3': (s, 0),
-            '4': (s/2, h),
-            '5': (-s/2, h),
-            '6': (-s, 0),
-            'N': (0, -h),
-            'NE': (3/4*s, -h/2),
-            'SE': (3/4*s, h/2),
-            'S': (0, h),
-            'SW': (-3/4*s, h/2),
-            'NW': (-3/4*s, -h/2)
-        }
-
-        self.context.move_to(*point['1'])
-        self.context.line_to(*point['2'])
-        self.context.line_to(*point['3'])
-        self.context.line_to(*point['4'])
-        self.context.line_to(*point['5'])
-        self.context.line_to(*point['6'])
-        self.context.line_to(*point['1'])
+        h = self.unit_length
+        s = self.side_length
+        vertices = self.vertices()
+        c.move_to(*vertices[0])
+        for v in vertices[1:]:
+            c.line_to(*v)
+        c.close_path()
 
         if self.outline:
             self.context.set_source_rgb(*self.colour)
@@ -86,8 +92,9 @@ class Hexag:
             self.context.set_source_rgb(*self.colour)
             self.context.fill()
 
-        for city in self.cities:
-            point[city.id] = city.x * self.size/2, city.y * self.size/2
+        city = dict()
+        for ct in self.revenuelocations:
+            city[ct.id] = ct
 
         self.context.set_source_rgb(*Colour.black)
 
@@ -97,45 +104,71 @@ class Hexag:
         connections_to_draw += [(conn, Colour.white, 4*mm, False) for conn in self.connections if conn.over]
         connections_to_draw += [(conn, Colour.black, 3*mm, True) for conn in self.connections if not conn.under]
 
+        for i, ct in enumerate(self.revenuelocations):
+            if ct.x is None or ct.y is None:
+                if len(self.revenuelocations) == 1:
+                    ct.x, ct.y = 0,0
+                elif len(self.revenuelocations) == 2:
+                    if i == 0:
+                        ct.x, ct.y = 0.6, -0.3
+                    else:
+                        ct.x, ct.y = -0.6, 0.3
+
         for conn, colour, linewidth, draw_towns in connections_to_draw:
-            if conn.side1 in ('N', 'NW', 'NE', 'S', 'SW', 'SE'):
-                p, q = point[conn.side1], point[conn.side2]
+            if isinstance(conn.side1, str):
+                conn.side1 = city[conn.side1]
+            if isinstance(conn.side2, str):
+                conn.side2 = city[conn.side2]
+            if isinstance(conn.side2, HexagEdge) and not isinstance(conn.side1, HexagEdge):
+                p, q = conn.side2, conn.side1
             else:
-                p, q = point[conn.side2], point[conn.side1]
+                p, q = conn.side1, conn.side2
 
             towns = []
             if draw_towns:
                 for arg in conn.args:
-                    if isinstance(arg, City.Town):
+                    if isinstance(arg, City.Town) or isinstance(arg, City.City):
                         towns.append(arg)
 
-            arc(self.context, p, q, towns)
+            arc(self, p, q, towns)
 
             self.context.set_line_width(linewidth)
             self.context.set_source_rgb(*colour)
             self.context.stroke()
 
-        for city in self.cities:
-            self.context.set_source_rgb(*Colour.white)
-            x = city.x * self.size/2
-            y = city.y * self.size/2
-            city.draw(self.map, self.context, x, y)
+        for i, ct in enumerate(self.revenuelocations):
+            ct.draw(self)
+            ct.draw_name(self)
+            ct.draw_value(self)
 
-        if self.text:
-            Output.draw_text(self.text, 'FreeSans', 8, self.context, 0, -0.3*h, halign='center')
+        if self.cost:
+            if self.revenuelocations:
+                y = -0.5 * h
+            else:
+                y = 0
+            self.cost.draw(c, 0, y)
+
+        if self.label:
+            if self.label_location:
+                x, y = self.label_location
+            else:
+                x, y = (0.7, 0.05)
+            Output.draw_text(self.label, 'FreeSans Bold', 10, self.context, x*h, y*h, valign='center', halign='center')
 
         return self.surface
 
 
-def arc(context, p, q, towns):
+def arc(hexag, p, q, towns):
+    context = hexag.context
+    h = hexag.unit_length
     # Create a circular arc from point P on a side of the hex to point q somehere in the hex,
     # perpendicular to the hexside at P.
-    angle_origin_to_p_wrt_xaxis = math.atan2(p[1], p[0])
+    angle_origin_to_p_wrt_xaxis = math.atan2(p.y, p.x)
     # print(f"alpha = {angle_origin_to_p_wrt_xaxis}")
     angle_of_hexside_wrt_xaxis = angle_origin_to_p_wrt_xaxis - pi / 2  # plus or minus k * pi
     # print(f"beta = {angle_of_hexside_wrt_xaxis}")
 
-    angle_of_pq_wrt_x_axis = math.atan2(q[1] - p[1], q[0] - p[0])
+    angle_of_pq_wrt_x_axis = math.atan2(q.y - p.y, q.x - p.x)
     # print(f"gamma = {angle_of_pq_wrt_x_axis}")
 
     while angle_of_hexside_wrt_xaxis - angle_of_pq_wrt_x_axis > pi / 2:
@@ -145,49 +178,54 @@ def arc(context, p, q, towns):
 
     # print(f"beta = {angle_of_hexside_wrt_xaxis}")
 
-    pq = sqrt((q[0] - p[0]) ** 2 + (q[1] - p[1]) ** 2)
+    pq = sqrt((q.x - p.x) ** 2 + (q.y - p.y) ** 2)
     # print(f"pq = {pq}")
     angle_of_pq_wrt_hexside = angle_of_pq_wrt_x_axis - angle_of_hexside_wrt_xaxis
 
     if abs(abs(angle_of_pq_wrt_hexside) - pi / 2) < 0.01:
         for town in towns:
-            x_town = (1 - town.location) * p[0] + town.location * q[0]
-            y_town = (1 - town.location) * p[1] + town.location * q[1]
+            x_town = (1 - town.location) * p.x + town.location * q.x
+            y_town = (1 - town.location) * p.y + town.location * q.y
 
-            context.set_line_width(3*mm)
-            context.set_source_rgb(*Colour.black)
-            # context.arc(x_town, y_town, 5*mm, 0, 2*pi)
-            context.move_to(x_town + town.length_bar/2 * math.sin(angle_of_pq_wrt_x_axis),
-                            y_town - town.length_bar/2 * math.cos(angle_of_pq_wrt_x_axis))
-            context.line_to(x_town - town.length_bar/2 * math.sin(angle_of_pq_wrt_x_axis),
-                            y_town + town.length_bar/2 * math.cos(angle_of_pq_wrt_x_axis))
-            context.stroke()
+            if isinstance(town, City.RevenueLocation):
+                town.x = x_town
+                town.y = y_town
+                if isinstance(town, City.Town):
+                    town.angle = angle_of_pq_wrt_x_axis + pi/2
+            else:
+                context.set_line_width(3*mm)
+                context.set_source_rgb(*Colour.black)
+                context.move_to((x_town + town.length_bar/2 * math.sin(angle_of_pq_wrt_x_axis)) * h,
+                                (y_town - town.length_bar/2 * math.cos(angle_of_pq_wrt_x_axis)) * h)
+                context.line_to((x_town - town.length_bar/2 * math.sin(angle_of_pq_wrt_x_axis)) * h,
+                                 (y_town + town.length_bar/2 * math.cos(angle_of_pq_wrt_x_axis)) * h)
+                context.stroke()
 
-        context.move_to(*p)
-        context.line_to(*q)
+        context.move_to(p.x * h, p.y * h)
+        context.line_to(q.x * h, q.y * h)
     else:
         radius_of_circle = pq / (2 * abs(math.sin(angle_of_pq_wrt_x_axis - angle_origin_to_p_wrt_xaxis)))
         # print(f"radius = {radius_of_circle}")
 
-        centre = (p[0] + radius_of_circle * math.cos(angle_of_hexside_wrt_xaxis),
-                  p[1] + radius_of_circle * math.sin(angle_of_hexside_wrt_xaxis))
+        centre = (p.x + radius_of_circle * math.cos(angle_of_hexside_wrt_xaxis),
+                  p.y + radius_of_circle * math.sin(angle_of_hexside_wrt_xaxis))
 
-        angle_centre_to_p = math.atan2(p[1] - centre[1], p[0] - centre[0])
-        angle_centre_to_q = math.atan2(q[1] - centre[1], q[0] - centre[0])
+        angle_centre_to_p = math.atan2(p.y - centre[1], p.x - centre[0])
+        angle_centre_to_q = math.atan2(q.y - centre[1], q.x - centre[0])
 
         alpha, beta = normalise_arc_angles(angle_centre_to_p, angle_centre_to_q)
 
         for town in towns:
             angle_town = town.location * alpha + (1-town.location) * beta
-            context.move_to(centre[0] + (radius_of_circle-town.length_bar/2) * math.cos(angle_town),
-                            centre[1] + (radius_of_circle-town.length_bar/2) * math.sin(angle_town))
-            context.line_to(centre[0] + (radius_of_circle+town.length_bar/2) * math.cos(angle_town),
-                            centre[1] + (radius_of_circle+town.length_bar/2) * math.sin(angle_town))
-            context.set_line_width(3*mm)
-            context.set_source_rgb(*Colour.black)
-            context.stroke()
+            if True or isinstance(town, City.City):
+                x = (centre[0] + radius_of_circle * math.cos(angle_town))
+                y = (centre[1] + radius_of_circle * math.sin(angle_town))
+                town.x = x
+                town.y = y
+                if isinstance(town, City.Town):
+                    town.angle = angle_town
 
-        context.arc(centre[0], centre[1], radius_of_circle, alpha, beta)
+        context.arc(centre[0] * h, centre[1] * h, radius_of_circle * h, alpha, beta)
 
 
 def normalise_arc_angles(alpha, beta):
@@ -205,69 +243,82 @@ def normalise_arc_angles(alpha, beta):
 
 class External(Hexag):
     default_colour = Colour.red
-    arrow_width = 0.2
-    arrow_length = 0.3
+    arrow_width = 0.1
+    arrow_length = 0.33
 
-    def __init__(self, *args, colour=None, links=None):
+    def __init__(self, *args, name=None, colour=None, links=None, values=None, value_location=None):
         self.links = links or set()
+        self.name = name
+        self.values = values
+        self.value_location = value_location
         super().__init__(*args, colour=colour or self.default_colour)
 
     def draw(self):
         super().draw()
+        c = self.context
 
-        h = self.height/2
-        s = self.radius
+        h = self.unit_length
+        s = self.side_length
         for direction in self.links:
-            if direction == 'S':
-                self.context.move_to(-self.arrow_width*h/2, h)
-                self.context.line_to(0, (1-self.arrow_length)*h)
-                self.context.line_to(self.arrow_width*h/2, h)
-                self.context.close_path()
-            elif direction == 'N':
-                self.context.move_to(-self.arrow_width*h/2, -h)
-                self.context.line_to(0, -(1-self.arrow_length)*h)
-                self.context.line_to(self.arrow_width*h/2, -h)
-                self.context.close_path()
-            elif direction == 'SW':
-                self.context.move_to(-0.75*s - self.arrow_width/4*h, (0.5 - self.arrow_width*sqrt(3)/4)*h)
-                self.context.line_to(-0.75*s + self.arrow_length*sqrt(3)/2*h, (0.5 - self.arrow_length/2)*h)
-                self.context.line_to(-0.75*s + self.arrow_width/4*h, (0.5 + self.arrow_width*sqrt(3)/4)*h)
-                self.context.close_path()
-            elif direction == 'SE':
-                self.context.move_to(0.75*s + self.arrow_width/4*h, (0.5 - self.arrow_width*sqrt(3)/4)*h)
-                self.context.line_to(0.75*s - self.arrow_length*sqrt(3)/2*h, (0.5 - self.arrow_length/2)*h)
-                self.context.line_to(0.75*s - self.arrow_width/4*h, (0.5 + self.arrow_width*sqrt(3)/4)*h)
-                self.context.close_path()
-            elif direction == 'NW':
-                self.context.move_to(-0.75*s - self.arrow_width/4*h, -(0.5 - self.arrow_width*sqrt(3)/4)*h)
-                self.context.line_to(-0.75*s + self.arrow_length*sqrt(3)/2*h, -(0.5 - self.arrow_length/2)*h)
-                self.context.line_to(-0.75*s + self.arrow_width/4*h, -(0.5 + self.arrow_width*sqrt(3)/4)*h)
-                self.context.close_path()
-            elif direction == 'NE':
-                self.context.move_to(0.75*s + self.arrow_width/4*h, -(0.5 - self.arrow_width*sqrt(3)/4)*h)
-                self.context.line_to(0.75*s - self.arrow_length*sqrt(3)/2*h, -(0.5 - self.arrow_length/2)*h)
-                self.context.line_to(0.75*s - self.arrow_width/4*h, -(0.5 + self.arrow_width*sqrt(3)/4)*h)
-                self.context.close_path()
+            tip_of_arrow = (direction.x * (1-self.arrow_length) * h, direction.y * (1-self.arrow_length) * h)
+            left_side = ((direction.x - math.sin(direction.angle) * self.arrow_width) * h,
+                         (direction.y + math.cos(direction.angle) * self.arrow_width) * h)
+            right_side = ((direction.x + math.sin(direction.angle) * self.arrow_width) * h,
+                          (direction.y - math.cos(direction.angle) * self.arrow_width) * h)
+            self.context.move_to(*left_side)
+            self.context.line_to(*tip_of_arrow)
+            self.context.line_to(*right_side)
+            self.context.line_to(*left_side)
             self.context.set_source_rgb(*Colour.black)
             self.context.fill()
+
+        if self.name:
+            Output.draw_text(self.name, 'FreeSans Italic', 8, c, 0, -.4*h, 'center', 'center')
+            c.stroke()
+
+        if self.values:
+            if self.value_location:
+                x_c, y_c = self.value_location
+            else:
+                x_c, y_c = 0, 0
+            for i, v in enumerate(self.values):
+                box_size = 8*mm
+                x = (i - len(self.values)/2) * box_size + x_c * self.unit_length
+                y = y_c * self.unit_length - box_size/2
+                c.rectangle(x, y, box_size, box_size)
+                c.set_source_rgb(*Colour.white)
+                c.fill_preserve()
+                c.set_source_rgb(*Colour.black)
+                c.stroke()
+                Output.draw_text(str(v), 'FreeSans', 8, c, x+box_size/2, y_c*self.unit_length, 'center', 'center')
+                c.stroke()
 
         return self.surface
 
 
-class HexagEdge:
+class LocationOnHexag:
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
 
+class HexagEdge(LocationOnHexag):
+    def __init__(self, angle):
+        self.angle = angle
+        super().__init__(x=math.cos(angle), y=math.sin(angle))
+
+
 def tile_sides(orientation):
-    if orientation == HORIZONTAL:
+    if orientation == VERTICAL:
         start_angle = pi/6
     else:
         start_angle = 0
     for i in range(6):
-        angle = start_angle - i*pi/3
-        return HexagEdge(math.cos(angle), math.sin(angle))
+        angle = start_angle + i*pi/3
+        yield HexagEdge(angle=angle)
+
+
+center_of_hexag = LocationOnHexag(0,0)
 
 
 class Connect:
@@ -277,6 +328,47 @@ class Connect:
         self.args = args
         self.over = over
         self.under = under
+
+    @property
+    def revenuelocations(self):
+        return [x for x in self.args if isinstance(x, City.RevenueLocation)]
+
+
+class Cost:
+    def __init__(self, cost):
+        self.cost = cost
+
+
+class Hill(Cost):
+    def draw(self, context, x, y):
+        context.move_to(x - 6 * mm, y + 0.5 * mm)
+        context.line_to(x, y - 10 * mm)
+        context.line_to(x + 6 * mm, y + 0.5 * mm)
+        context.close_path()
+
+        context.set_source_rgb(*Colour.brown)
+        context.fill_preserve()
+        context.set_source_rgb(*Colour.black)
+        context.stroke()
+
+        Output.draw_text(self.cost, 'FreeSans', 8, context, x, y, 'bottom', 'center')
+
+
+class Water(Cost):
+    def draw(self, context, x, y):
+        context.move_to(x - 6 * mm, y + 0.5 * mm)
+        context.line_to(x, y - 10 * mm)
+        context.line_to(x + 6 * mm, y + 0.5 * mm)
+        context.close_path()
+
+        context.set_source_rgb(*Colour.lightblue)
+        context.fill_preserve()
+        context.set_source_rgb(*Colour.black)
+        context.stroke()
+
+        Output.draw_text(self.cost, 'FreeSans', 8, context, x, y, 'bottom', 'center')
+
+
 
 
 empty = Hexag()
