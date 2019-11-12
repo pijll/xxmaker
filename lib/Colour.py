@@ -17,6 +17,8 @@ phase_2 = green
 phase_3 = russet
 phase_4 = grey
 
+purple = (.5, .33, .5)
+
 
 def brightness(colour):
     return 0.299 * colour[0] + 0.587 * colour[1] + 0.114 * colour[2]

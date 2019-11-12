@@ -34,6 +34,8 @@ class Hexag:
             elif isinstance(arg, Connect):
                 self.connections.append(arg)
                 self.revenuelocations += arg.revenuelocations
+            elif isinstance(arg, Cost):
+                self.cost = arg
         self.map = None
 
     @property
@@ -154,6 +156,17 @@ class Hexag:
             else:
                 x, y = (0.7, 0.05)
             Output.draw_text(self.label, 'FreeSans Bold', 10, self.context, x*h, y*h, valign='center', halign='center')
+
+        if self.outline:
+            vertices = self.vertices()
+            c.move_to(*vertices[0])
+            for v in vertices[1:]:
+                c.line_to(*v)
+            c.close_path()
+
+            self.context.set_line_width(1)
+            self.context.set_source_rgb(*Colour.black)
+            self.context.stroke()
 
         return self.surface
 
@@ -351,7 +364,7 @@ class Hill(Cost):
         context.set_source_rgb(*Colour.black)
         context.stroke()
 
-        Output.draw_text(self.cost, 'FreeSans', 8, context, x, y, 'bottom', 'center')
+        Output.draw_text(str(self.cost), 'FreeSans', 8, context, x, y, 'bottom', 'center')
 
 
 class Water(Cost):
@@ -366,7 +379,7 @@ class Water(Cost):
         context.set_source_rgb(*Colour.black)
         context.stroke()
 
-        Output.draw_text(self.cost, 'FreeSans', 8, context, x, y, 'bottom', 'center')
+        Output.draw_text(str(self.cost), 'FreeSans', 8, context, x, y, 'bottom', 'center')
 
 
 
