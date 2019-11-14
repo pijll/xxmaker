@@ -36,6 +36,9 @@ class Hexag:
                 self.revenuelocations += arg.revenuelocations
             elif isinstance(arg, Cost):
                 self.cost = arg
+            elif isinstance(arg, Colour.Colour):
+                self.colour = arg
+
         self.map = None
 
     @property
@@ -86,19 +89,19 @@ class Hexag:
         c.close_path()
 
         if self.outline:
-            self.context.set_source_rgb(*self.colour)
+            self.context.set_source_rgb(*self.colour.rgb)
             self.context.fill_preserve()
-            self.context.set_source_rgb(*Colour.black)
+            self.context.set_source_rgb(*Colour.black.rgb)
             self.context.stroke()
         else:
-            self.context.set_source_rgb(*self.colour)
+            self.context.set_source_rgb(*self.colour.rgb)
             self.context.fill()
 
         city = dict()
         for ct in self.revenuelocations:
             city[ct.id] = ct
 
-        self.context.set_source_rgb(*Colour.black)
+        self.context.set_source_rgb(*Colour.black.rgb)
 
         connections_to_draw = []
         connections_to_draw += [(conn, Colour.white, 4*mm, False) for conn in self.connections if not conn.over]
@@ -135,7 +138,7 @@ class Hexag:
             arc(self, p, q, towns)
 
             self.context.set_line_width(linewidth)
-            self.context.set_source_rgb(*colour)
+            self.context.set_source_rgb(*colour.rgb)
             self.context.stroke()
 
         for i, ct in enumerate(self.revenuelocations):
@@ -165,7 +168,7 @@ class Hexag:
             c.close_path()
 
             self.context.set_line_width(1)
-            self.context.set_source_rgb(*Colour.black)
+            self.context.set_source_rgb(*Colour.black.rgb)
             self.context.stroke()
 
         return self.surface
@@ -207,7 +210,7 @@ def arc(hexag, p, q, towns):
                     town.angle = angle_of_pq_wrt_x_axis + pi/2
             else:
                 context.set_line_width(3*mm)
-                context.set_source_rgb(*Colour.black)
+                context.set_source_rgb(*Colour.black.rgb)
                 context.move_to((x_town + town.length_bar/2 * math.sin(angle_of_pq_wrt_x_axis)) * h,
                                 (y_town - town.length_bar/2 * math.cos(angle_of_pq_wrt_x_axis)) * h)
                 context.line_to((x_town - town.length_bar/2 * math.sin(angle_of_pq_wrt_x_axis)) * h,
@@ -282,7 +285,7 @@ class External(Hexag):
             self.context.line_to(*tip_of_arrow)
             self.context.line_to(*right_side)
             self.context.line_to(*left_side)
-            self.context.set_source_rgb(*Colour.black)
+            self.context.set_source_rgb(*Colour.black.rgb)
             self.context.fill()
 
         if self.name:
@@ -299,9 +302,9 @@ class External(Hexag):
                 x = (i - len(self.values)/2) * box_size + x_c * self.unit_length
                 y = y_c * self.unit_length - box_size/2
                 c.rectangle(x, y, box_size, box_size)
-                c.set_source_rgb(*Colour.white)
+                c.set_source_rgb(*Colour.white.rgb)
                 c.fill_preserve()
-                c.set_source_rgb(*Colour.black)
+                c.set_source_rgb(*Colour.black.rgb)
                 c.stroke()
                 Output.draw_text(str(v), 'FreeSans', 8, c, x+box_size/2, y_c*self.unit_length, 'center', 'center')
                 c.stroke()
@@ -359,9 +362,9 @@ class Hill(Cost):
         context.line_to(x + 6 * mm, y + 0.5 * mm)
         context.close_path()
 
-        context.set_source_rgb(*Colour.brown)
+        context.set_source_rgb(*Colour.brown.rgb)
         context.fill_preserve()
-        context.set_source_rgb(*Colour.black)
+        context.set_source_rgb(*Colour.black.rgb)
         context.stroke()
 
         Output.draw_text(str(self.cost), 'FreeSans', 8, context, x, y, 'bottom', 'center')
@@ -374,9 +377,9 @@ class Water(Cost):
         context.line_to(x + 6 * mm, y + 0.5 * mm)
         context.close_path()
 
-        context.set_source_rgb(*Colour.lightblue)
+        context.set_source_rgb(*Colour.lightblue.rgb)
         context.fill_preserve()
-        context.set_source_rgb(*Colour.black)
+        context.set_source_rgb(*Colour.black.rgb)
         context.stroke()
 
         Output.draw_text(str(self.cost), 'FreeSans', 8, context, x, y, 'bottom', 'center')

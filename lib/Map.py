@@ -56,7 +56,7 @@ class Map:
             paper.context.set_source_surface(hexag.draw(), int(x), y)
             paper.context.paint()
 
-        paper.context.set_source_rgb(*Colour.black)
+        paper.context.set_source_rgb(*Colour.black.rgb)
         Output.draw_text(self.game.name, 'Sancreek', 40, paper.context, 30, 20)
         if self.game.author:
             Output.draw_text(self.game.author, 'FreeSans', 10, paper.context, 100, 20)

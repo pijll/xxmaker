@@ -38,21 +38,21 @@ class Company:
         c = charter.context
 
         c.rectangle(margin, margin, width - 2*margin, height_namebar)
-        c.set_source_rgb(*self.colour)
+        c.set_source_rgb(*self.colour.rgb)
         c.fill_preserve()
-        c.set_source_rgb(*Colour.black)
+        c.set_source_rgb(*Colour.black.rgb)
         c.set_line_width(1*mm)
         c.stroke()
 
-        if Colour.brightness(self.colour) > 0.5:
-            c.set_source_rgb(*Colour.black)
+        if self.colour.brightness() > 0.5:
+            c.set_source_rgb(*Colour.black.rgb)
         else:
-            c.set_source_rgb(*Colour.white)
+            c.set_source_rgb(*Colour.white.rgb)
         Output.draw_text(self.name, 'Tex Gyre Schola bold', height_namebar/3, c, width/2 + height_tokenbar/2, margin + height_namebar/2,
                          'center', 'center')
         self.paint_logo(c, margin + height_namebar/2, margin + height_namebar/2)
 
-        c.set_source_rgb(*Colour.black)
+        c.set_source_rgb(*Colour.black.rgb)
         c.rectangle(margin, margin, width - 2*margin, height - 2*margin)
         c.stroke()
 
@@ -84,14 +84,14 @@ class Company:
         share = Paper.Paper()
         c = share.context
 
-        c.set_source_rgba(*self.colour, 0.1)
+        c.set_source_rgba(*self.colour.rgb, 0.1)
         c.paint()
 
-        c.set_source_rgb(*self.colour)
+        c.set_source_rgb(*self.colour.rgb)
         c.rectangle(3*mm, 0, 13*mm, share.height)
         c.fill()
 
-        c.set_source_rgb(*Colour.black)
+        c.set_source_rgb(*Colour.black.rgb)
 
 #        c.move_to(10*mm, 10*mm)
 #        c.show_text(self.name)
@@ -115,7 +115,7 @@ class Company:
     def _make_logo_from_image(self, logo_file, radius):
         surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(0, 0, 2*radius, 2*radius))
         context = cairo.Context(surface)
-        context.set_source_rgb(*Colour.white)
+        context.set_source_rgb(*Colour.white.rgb)
         context.arc(radius, radius, radius, 0, 6.29)
         context.fill()
         Output.load_image(logo_file, context, radius, radius, radius * 1.9, radius * 1.9, circle_clip=True)
@@ -124,11 +124,11 @@ class Company:
     def _make_logo_from_abbrev(self, abbreviation, radius):
         surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(0, 0, 2 * radius, 2 * radius))
         context = cairo.Context(surface)
-        context.set_source_rgb(*Colour.white)
+        context.set_source_rgb(*Colour.white.rgb)
         context.arc(radius, radius, radius, 0, 6.29)
         context.fill()
 
-        context.set_source_rgb(*Colour.black)
+        context.set_source_rgb(*Colour.black.rgb)
         # context.set_font_size(1)
         # text_width = context.text_extents(abbreviation)[2]
         # scaling = radius*2 / text_width

@@ -27,7 +27,7 @@ class RevenueLocation:
         x = (self.x + self.value_location[0]) * hexag.unit_length
         y = (self.y + self.value_location[1]) * hexag.unit_length
         c = hexag.context
-        c.set_source_rgb(*Colour.black)
+        Colour.black.use_in_context(c)
         Output.draw_text(str(self.value), 'FreeSans', 7, c, x, y, 'center', 'center')
         c.stroke()
         c.set_line_width(1)
@@ -37,7 +37,7 @@ class RevenueLocation:
     def draw_name(self, hexag):
         if self.name:
             c = hexag.context
-            c.set_source_rgb(*Colour.black)
+            Colour.black.use_in_context(c)
             if self.name_location is None:
                 if self.x > 0.4:
                     self.name_location = (-.2, 0, 'center', 'right')
@@ -76,10 +76,10 @@ class City(RevenueLocation):
 
         city_radius = Company.logo_radius * 1.1
 
-        context.set_source_rgb(*Colour.white)
+        Colour.white.use_in_context(context)
         context.arc(x, y, city_radius, 0, 2 * pi)
         context.fill_preserve()
-        context.set_source_rgb(*Colour.black)
+        Colour.black.use_in_context(context)
         context.set_line_width(cls.border_width)
         context.stroke()
 
@@ -96,10 +96,10 @@ class DoubleCity(City):
 
         context.rectangle(self.x*hexag.unit_length - city_radius, self.y*hexag.unit_length - city_radius,
                           2*city_radius, 2*city_radius)
-        context.set_source_rgb(*Colour.white)
+        Colour.white.use_in_context(context)
         context.set_line_width(self.border_width)
         context.fill_preserve()
-        context.set_source_rgb(*Colour.black)
+        Colour.black.use_in_context(context)
         context.stroke()
 
         for i in (0, 1):
@@ -124,10 +124,10 @@ class Town(RevenueLocation):
     def draw(self, hexag):
         c = hexag.context
         if self.angle is None:
-            c.set_source_rgb(*Colour.white)
+            Colour.white.use_in_context(c)
             c.arc(self.x, self.y, self.radius*hexag.unit_length + 0.5*mm, 0, 2*pi)
             c.fill()
-            c.set_source_rgb(*Colour.black)
+            Colour.black.use_in_context(c)
             c.arc(self.x, self.y, self.radius*hexag.unit_length, 0, 2*pi)
             c.fill()
         else:
@@ -136,7 +136,7 @@ class Town(RevenueLocation):
             c.move_to((self.x - dx_bar/2)*hexag.unit_length, (self.y - dy_bar/2)*hexag.unit_length)
             c.line_to((self.x + dx_bar/2)*hexag.unit_length, (self.y + dy_bar/2)*hexag.unit_length)
             c.set_line_width(self.bar_width)
-            c.set_source_rgb(*Colour.black)
+            Colour.black.use_in_context(c)
             c.stroke()
 
             if self.value_location is None:
