@@ -12,6 +12,7 @@ class Game:
         self.stockmarket = None
         self.author = author
         self.currency = currency
+        self.papers = []
 #        self.tilesize = 38*mm   # side to side
 
     def add_company(self, company):
@@ -36,3 +37,6 @@ class Game:
 
     def add_stockmarket(self, stockmarket):
         self.stockmarket = stockmarket
+
+    def add_paper(self, paper):
+        self.papers.append(paper)

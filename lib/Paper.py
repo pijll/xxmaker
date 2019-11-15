@@ -18,16 +18,3 @@ class Paper:
         # self.context.stroke()
 
         self.font_map = PangoCairo.FontMap.get_default()
-
-
-def priority_deal():
-    pd = Paper()
-
-    # pd.context.set_source_rgb(0, 0, 0)
-    # pd.context.move_to(10*mm, 15*mm)
-    # pd.context.show_text("Priority Deal")
-
-    Output.load_image('../../../graphics/misc/Elephant.png', pd.context, pd.width/2, pd.height/2,
-                      pd.width-6*mm, pd.height-6*mm)
-
-    return pd

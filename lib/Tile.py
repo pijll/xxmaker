@@ -5,6 +5,7 @@ from math import sqrt
 from City import Town, City, DoubleCity
 import Hexag
 from Hexag import Connect
+import OutputFunctions
 
 # Distance from flat side to flat side
 tile_size = 38*mm
@@ -44,9 +45,10 @@ class Tile:
         self.surface = self.hexag.draw()
         self.context = self.hexag.context
 
-        self.context.set_source_rgb(*Colour.black)
+        self.context.set_source_rgb(*Colour.black.rgb)
         self.context.move_to(0.25 * self.hexag.side_length, 0.8 * self.hexag.side_length)
-        self.context.show_text(str(self.number))
+        OutputFunctions.draw_text(str(self.number), 'FreeSans', 5, self.context,
+                                  self.hexag.unit_length/(3**.5), self.hexag.unit_length, valign='bottom', halign='right')
 
         return self.surface
 

@@ -32,7 +32,7 @@ class Stockmarket:
     def paper(self):
         paper = Paper.Paper(self.width*Cell.width+2*self.margin, self.height*Cell.height+2*self.margin)
         c = paper.context
-        c.set_source_rgb(*Colour.black)
+        c.set_source_rgb(*Colour.black.rgb)
         c.set_line_width(1)
         for cell in self.cells.values():
             cell.draw(paper.context)
@@ -63,9 +63,9 @@ class Cell:
     def draw(self, c):
         c.rectangle(self.x, self.y, self.width, self.height)
         if self.colour:
-            c.set_source_rgb(*self.colour)
+            c.set_source_rgb(*self.colour.rgb)
             c.fill_preserve()
-        c.set_source_rgb(*Colour.black)
+        c.set_source_rgb(*Colour.black.rgb)
         c.stroke()
         Output.draw_text(str(self.value), 'FreeSans', 8, c,
                          self.x + 1*mm,

@@ -138,7 +138,7 @@ class Company:
         #
         # context.move_to(radius - width/2 - x_bearing, radius - height/2 - y_bearing)
         # context.show_text(abbreviation)
-        Output.draw_text(abbreviation, 'Woodcut', 8, context, radius, radius+1*mm, 'center', 'center')
+        Output.draw_text(abbreviation, 'TexGyre Heros Bold', 8, context, radius, radius, 'center', 'center')
 
         return surface
 

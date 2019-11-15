@@ -1,4 +1,5 @@
 from gi.repository import Pango, PangoCairo
+import cairo
 
 
 def draw_text(text, font_name, font_size, context, x, y, valign='top', halign='left'):
@@ -55,3 +56,25 @@ def draw_centered_lines(text, font_name, font_size, context, x_c, y, width, vali
     x, y = x_c - width / 2, y_reference
     context.move_to(x, y)
     PangoCairo.show_layout(context, layout)
+
+
+def load_image(filename, context, x_c, y_c, width, height, circle_clip=False):
+    try:
+        image = cairo.ImageSurface.create_from_png(filename)
+    except cairo.Error:
+        print(f'{cairo.Error}, filename={filename}')
+        return
+
+    img_width = image.get_width()
+    img_height = image.get_height()
+
+    scale = min(width / image.get_width(), height / image.get_height())
+
+    context.save()
+    context.scale(scale, scale)
+    context.set_source_surface(image, x_c/scale - img_width/2, y_c/scale - img_height/2)
+    if circle_clip:
+        context.arc(x_c/scale, y_c/scale, max(img_width, img_height)/2, 0, 6.29)
+        context.clip()
+    context.paint()
+    context.restore()

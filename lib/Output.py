@@ -148,7 +148,8 @@ class Output:
         for private in self.game.privates:
             papers.append(private.paper())
 
-        papers.append(Paper.priority_deal())
+        for paper in self.game.papers:
+            papers.append(paper)
 
         papers_by_dimension = collections.defaultdict(list)
         for paper in papers:

@@ -8,3 +8,6 @@ PORTRAIT = object()
 # tile/hexag orientations
 HORIZONTAL = object()
 VERTICAL = object()
+
+# radius of company logo
+logo_radius = 5.5*mm

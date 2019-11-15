@@ -8,13 +8,12 @@ import Colour
 import City
 import Company
 
-
-hexag_size = 40*mm      # edge to edge
+hexag_size = 40 * mm  # edge to edge
 
 
 class Hexag:
     def __init__(self, *args, colour=None, size=None, outline=True, label=None, label_location=None,
-                 orientation=None, border=None, cost=None):
+                 orientation=None, border=None, cost=None, no_border=None):
         self.size = size or hexag_size
         self.surface = None
         self.context = None
@@ -25,6 +24,7 @@ class Hexag:
         self.cost = cost
         self.orientation = orientation
         self.border = border
+        self.no_border = no_border or []
 
         self.revenuelocations = []
         self.connections = []
@@ -43,11 +43,11 @@ class Hexag:
 
     @property
     def unit_length(self):
-        return self.size/2
+        return self.size / 2
 
     @property
     def side_length(self):
-        return self.size/sqrt(3)
+        return self.size / sqrt(3)
 
     @property
     def width(self):
@@ -61,41 +61,37 @@ class Hexag:
         if self.orientation == VERTICAL:
             return self.size
         else:
-            return 2* self.side_length
+            return 2 * self.side_length
 
     def vertices(self):
         h = self.unit_length
         s = self.side_length
         if self.orientation == VERTICAL:
-            return [(-s/2, -h), (s/2, -h), (s, 0), (s/2, h), (-s/2, h), (-s, 0)]
+            start_angle = 0
         else:
-            return [(0, s), (h, s/2), (h, -s/2), (0, -s), (-h, -s/2), (-h, s/2)]
+            start_angle = pi/6
+        return [Vertex(angle=start_angle + x * pi/3) for x in range(6)]
 
     def draw(self):
         if self.surface:
             return self.surface
 
         self.surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(-self.width, -self.height,
-                                                                                         2*self.width, 2*self.height))
+                                                                                         2 * self.width,
+                                                                                         2 * self.height))
         self.context = cairo.Context(self.surface)
         c = self.context
 
         h = self.unit_length
         s = self.side_length
         vertices = self.vertices()
-        c.move_to(*vertices[0])
+        c.move_to(*vertices[0].xy(unit_length=self.unit_length))
         for v in vertices[1:]:
-            c.line_to(*v)
+            c.line_to(*v.xy(unit_length=self.unit_length))
         c.close_path()
 
-        if self.outline:
-            self.context.set_source_rgb(*self.colour.rgb)
-            self.context.fill_preserve()
-            self.context.set_source_rgb(*Colour.black.rgb)
-            self.context.stroke()
-        else:
-            self.context.set_source_rgb(*self.colour.rgb)
-            self.context.fill()
+        self.context.set_source_rgb(*self.colour.rgb)
+        self.context.fill()
 
         city = dict()
         for ct in self.revenuelocations:
@@ -104,15 +100,15 @@ class Hexag:
         self.context.set_source_rgb(*Colour.black.rgb)
 
         connections_to_draw = []
-        connections_to_draw += [(conn, Colour.white, 4*mm, False) for conn in self.connections if not conn.over]
-        connections_to_draw += [(conn, Colour.black, 3*mm, True) for conn in self.connections if conn.under]
-        connections_to_draw += [(conn, Colour.white, 4*mm, False) for conn in self.connections if conn.over]
-        connections_to_draw += [(conn, Colour.black, 3*mm, True) for conn in self.connections if not conn.under]
+        connections_to_draw += [(conn, Colour.white, 4 * mm, False) for conn in self.connections if not conn.over]
+        connections_to_draw += [(conn, Colour.black, 3 * mm, True) for conn in self.connections if conn.under]
+        connections_to_draw += [(conn, Colour.white, 4 * mm, False) for conn in self.connections if conn.over]
+        connections_to_draw += [(conn, Colour.black, 3 * mm, True) for conn in self.connections if not conn.under]
 
         for i, ct in enumerate(self.revenuelocations):
             if ct.x is None or ct.y is None:
                 if len(self.revenuelocations) == 1:
-                    ct.x, ct.y = 0,0
+                    ct.x, ct.y = 0, 0
                 elif len(self.revenuelocations) == 2:
                     if i == 0:
                         ct.x, ct.y = 0.6, -0.3
@@ -158,14 +154,19 @@ class Hexag:
                 x, y = self.label_location
             else:
                 x, y = (0.7, 0.05)
-            Output.draw_text(self.label, 'FreeSans Bold', 10, self.context, x*h, y*h, valign='center', halign='center')
+            Output.draw_text(self.label, 'FreeSans Bold', 10, self.context, x * h, y * h, valign='center',
+                             halign='center')
 
         if self.outline:
             vertices = self.vertices()
-            c.move_to(*vertices[0])
-            for v in vertices[1:]:
-                c.line_to(*v)
-            c.close_path()
+            vertices.append(vertices[0])
+            c.move_to(*vertices[0].xy(unit_length=self.unit_length))
+            for v in range(len(vertices)-1):
+                angles_edge = normalise_arc_angles(vertices[v].angle, vertices[v+1].angle)
+                if any(angles_edge[0] < nb.angle < angles_edge[1] for nb in self.no_border):
+                    c.move_to(*vertices[v + 1].xy(unit_length=self.unit_length))
+                else:
+                    c.line_to(*vertices[v + 1].xy(unit_length=self.unit_length))
 
             self.context.set_line_width(1)
             self.context.set_source_rgb(*Colour.black.rgb)
@@ -207,14 +208,14 @@ def arc(hexag, p, q, towns):
                 town.x = x_town
                 town.y = y_town
                 if isinstance(town, City.Town):
-                    town.angle = angle_of_pq_wrt_x_axis + pi/2
+                    town.angle = angle_of_pq_wrt_x_axis + pi / 2
             else:
-                context.set_line_width(3*mm)
+                context.set_line_width(3 * mm)
                 context.set_source_rgb(*Colour.black.rgb)
-                context.move_to((x_town + town.length_bar/2 * math.sin(angle_of_pq_wrt_x_axis)) * h,
-                                (y_town - town.length_bar/2 * math.cos(angle_of_pq_wrt_x_axis)) * h)
-                context.line_to((x_town - town.length_bar/2 * math.sin(angle_of_pq_wrt_x_axis)) * h,
-                                 (y_town + town.length_bar/2 * math.cos(angle_of_pq_wrt_x_axis)) * h)
+                context.move_to((x_town + town.length_bar / 2 * math.sin(angle_of_pq_wrt_x_axis)) * h,
+                                (y_town - town.length_bar / 2 * math.cos(angle_of_pq_wrt_x_axis)) * h)
+                context.line_to((x_town - town.length_bar / 2 * math.sin(angle_of_pq_wrt_x_axis)) * h,
+                                (y_town + town.length_bar / 2 * math.cos(angle_of_pq_wrt_x_axis)) * h)
                 context.stroke()
 
         context.move_to(p.x * h, p.y * h)
@@ -232,7 +233,7 @@ def arc(hexag, p, q, towns):
         alpha, beta = normalise_arc_angles(angle_centre_to_p, angle_centre_to_q)
 
         for town in towns:
-            angle_town = town.location * alpha + (1-town.location) * beta
+            angle_town = town.location * alpha + (1 - town.location) * beta
             if True or isinstance(town, City.City):
                 x = (centre[0] + radius_of_circle * math.cos(angle_town))
                 y = (centre[1] + radius_of_circle * math.sin(angle_town))
@@ -249,11 +250,11 @@ def normalise_arc_angles(alpha, beta):
     # The return values will satisfy the conditions:
     # * The angles will be returned in ascending order
     # * One of the angles will be equal to alpha + m*pi, the other to beta + n*pi
-    # * the difference betwee the angles is smaller than pi
+    # * the difference between the angles is smaller than pi
     while alpha - beta > pi:
-        alpha -= 2*pi
+        alpha -= 2 * pi
     while beta - alpha > pi:
-        beta -= 2*pi
+        beta -= 2 * pi
     return min(alpha, beta), max(alpha, beta)
 
 
@@ -262,12 +263,12 @@ class External(Hexag):
     arrow_width = 0.1
     arrow_length = 0.33
 
-    def __init__(self, *args, name=None, colour=None, links=None, values=None, value_location=None):
+    def __init__(self, *args, name=None, colour=None, links=None, values=None, value_location=None, **kwargs):
         self.links = links or set()
         self.name = name
         self.values = values
         self.value_location = value_location
-        super().__init__(*args, colour=colour or self.default_colour)
+        super().__init__(*args, colour=colour or self.default_colour, **kwargs)
 
     def draw(self):
         super().draw()
@@ -276,7 +277,7 @@ class External(Hexag):
         h = self.unit_length
         s = self.side_length
         for direction in self.links:
-            tip_of_arrow = (direction.x * (1-self.arrow_length) * h, direction.y * (1-self.arrow_length) * h)
+            tip_of_arrow = (direction.x * (1 - self.arrow_length) * h, direction.y * (1 - self.arrow_length) * h)
             left_side = ((direction.x - math.sin(direction.angle) * self.arrow_width) * h,
                          (direction.y + math.cos(direction.angle) * self.arrow_width) * h)
             right_side = ((direction.x + math.sin(direction.angle) * self.arrow_width) * h,
@@ -289,7 +290,7 @@ class External(Hexag):
             self.context.fill()
 
         if self.name:
-            Output.draw_text(self.name, 'FreeSans Italic', 8, c, 0, -.4*h, 'center', 'center')
+            Output.draw_text(self.name, 'FreeSans Italic', 8, c, 0, -.4 * h, 'center', 'center')
             c.stroke()
 
         if self.values:
@@ -298,43 +299,65 @@ class External(Hexag):
             else:
                 x_c, y_c = 0, 0
             for i, v in enumerate(self.values):
-                box_size = 8*mm
-                x = (i - len(self.values)/2) * box_size + x_c * self.unit_length
-                y = y_c * self.unit_length - box_size/2
+                box_size = 8 * mm
+                x = (i - len(self.values) / 2) * box_size + x_c * self.unit_length
+                y = y_c * self.unit_length - box_size / 2
                 c.rectangle(x, y, box_size, box_size)
                 c.set_source_rgb(*Colour.white.rgb)
                 c.fill_preserve()
                 c.set_source_rgb(*Colour.black.rgb)
                 c.stroke()
-                Output.draw_text(str(v), 'FreeSans', 8, c, x+box_size/2, y_c*self.unit_length, 'center', 'center')
+                Output.draw_text(str(v), 'FreeSans', 8, c, x + box_size / 2, y_c * self.unit_length, 'center', 'center')
                 c.stroke()
 
         return self.surface
 
 
 class LocationOnHexag:
+    """Location on hexag, in units of hexag.unit_lenght (= distance center to flat edge)"""
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
+    @property
+    def angle(self):
+        return math.atan2(self.y, self.x)
+
+    def xy(self, unit_length=1):
+        return self.x * unit_length, self.y * unit_length
+
 
 class HexagEdge(LocationOnHexag):
     def __init__(self, angle):
-        self.angle = angle
+        self._angle = angle
         super().__init__(x=math.cos(angle), y=math.sin(angle))
+
+    @property
+    def angle(self):
+        return self._angle
+
+
+class Vertex(LocationOnHexag):
+    def __init__(self, angle):
+        self._angle = angle
+        super().__init__(x=2/sqrt(3)*math.cos(angle), y=2/sqrt(3)*math.sin(angle))
+
+    @property
+    def angle(self):
+        return self._angle
 
 
 def tile_sides(orientation):
     if orientation == VERTICAL:
-        start_angle = pi/6
+        start_angle = pi / 6
     else:
         start_angle = 0
     for i in range(6):
-        angle = start_angle + i*pi/3
+        angle = start_angle + i * pi / 3
         yield HexagEdge(angle=angle)
 
 
-center_of_hexag = LocationOnHexag(0,0)
+center_of_hexag = LocationOnHexag(0, 0)
 
 
 class Connect:
@@ -383,8 +406,6 @@ class Water(Cost):
         context.stroke()
 
         Output.draw_text(str(self.cost), 'FreeSans', 8, context, x, y, 'bottom', 'center')
-
-
 
 
 empty = Hexag()
