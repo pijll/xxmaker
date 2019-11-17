@@ -23,6 +23,7 @@ class Map:
         self.orientation = orientation
         self.hexags = dict()
         self.game = None
+        self.elements = []
 
     def add_hexag(self, coords, hexag=None):
         row, column = coords_to_rowcolumn(coords)
@@ -62,6 +63,22 @@ class Map:
             Output.draw_text(self.game.author, 'FreeSans', 10, paper.context, 100, 20)
         paper.context.stroke()
 
+        for element, location in self.elements:
+            surface = element.draw()
+            extents = surface.get_extents()
+            if 'top' in location:
+                y = self.margin
+            elif 'bottom' in location:
+                y = self.height() - self.margin - extents.height
+            if 'left' in location:
+                x = self.margin
+            elif 'right' in location:
+                x = self.width() - self.margin - extents.width
+
+            paper.context.set_source_surface(surface, x, y)
+            paper.context.paint()
+
+
         return paper
 
     def position_of_hexag(self, row, column):
@@ -72,6 +89,9 @@ class Map:
             y = row * 1.5 * s + self.margin
             x = column * hexag_size / 2 + self.margin
         return x, y
+
+    def add_element(self, element, location='top left'):
+        self.elements.append((element, location))
 
 
 def coords_to_rowcolumn(coords):

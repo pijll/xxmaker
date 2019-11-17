@@ -21,6 +21,8 @@ class Stockmarket:
                     (cell.row-1, cell.column) in self.cells:
                 cell.up_arrow = True
 
+        self.current_round_marker = None
+
     @property
     def width(self):
         return max(cell.column for cell in self.cells.values()) + 1
@@ -36,6 +38,13 @@ class Stockmarket:
         c.set_line_width(1)
         for cell in self.cells.values():
             cell.draw(paper.context)
+
+        if self.current_round_marker:
+            round_surface = self.current_round_marker.draw()
+            extents = round_surface.get_extents()
+            c.set_source_surface(round_surface, paper.width - self.margin - extents.width,
+                                 paper.height - self.margin - extents.height)
+            c.paint()
 
         return paper
 

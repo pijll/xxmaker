@@ -44,8 +44,6 @@ class Private:
 
         if self.image:
             filename = '../../../graphics/trains/' + self.image
-        else:
-            filename = '../../../graphics/trains/free/LocomotiveStreetsignDE.png'
             Output.load_image(filename, c, x_c=(paper.width+16*mm)/2, y_c=(paper.height+10*mm)/2,
                               width=paper.width - 19*mm, height=paper.height - 13*mm)
 
