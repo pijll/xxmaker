@@ -11,6 +11,9 @@ class RoundIndicator:
     margin = 2*mm
     minimum_space_between_circles = 10*mm
 
+    arrow_head_angle = pi/8
+    arrow_head_length = 2*mm
+
     def __init__(self, *phase_colours):
         self.phase_colours = phase_colours
 
@@ -57,6 +60,17 @@ class RoundIndicator:
             arrow_start_angle = angle + logo_radius/radius_circle + 0.15
             arrow_end_angle = angle + 2*pi/self.n_circles - logo_radius/radius_circle - 0.15
             context.arc(width/2, height/2, radius_circle, arrow_start_angle, arrow_end_angle)
+            context.stroke()
+
+            arrowhead_x = width/2 + radius_circle * math.cos(arrow_end_angle)
+            arrowhead_y = height/2 + radius_circle * math.sin(arrow_end_angle)
+
+            context.move_to(arrowhead_x, arrowhead_y)
+            context.line_to(arrowhead_x + self.arrow_head_length * math.cos(arrow_end_angle - pi/2 + self.arrow_head_angle),
+                            arrowhead_y + self.arrow_head_length * math.sin(arrow_end_angle - pi/2 + self.arrow_head_angle))
+            context.line_to(arrowhead_x + self.arrow_head_length * math.cos(arrow_end_angle - pi/2 - self.arrow_head_angle),
+                            arrowhead_y + self.arrow_head_length * math.sin(arrow_end_angle - pi/2 - self.arrow_head_angle))
+            context.close_path()
             context.stroke()
 
         return surface

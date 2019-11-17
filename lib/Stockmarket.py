@@ -60,6 +60,7 @@ class Cell:
         self.colour = colour
         self.down_arrow = down_arrow
         self.up_arrow = up_arrow
+        self.is_par = False
 
     @property
     def x(self):
@@ -74,11 +75,24 @@ class Cell:
         if self.colour:
             c.set_source_rgb(*self.colour.rgb)
             c.fill_preserve()
+
+        if self.is_par:
+            c.set_source_rgb(*Colour.lightgreen.rgb)
+            c.fill_preserve()
+
         c.set_source_rgb(*Colour.black.rgb)
         c.stroke()
+
+        if self.is_par:
+            c.rectangle(self.x + 2*mm, self.y + 2*mm, self.width - 4*mm, self.height - 4*mm)
+            c.set_source_rgb(*Colour.white.rgb)
+            c.fill()
+
+        c.set_source_rgb(*Colour.black.rgb)
         Output.draw_text(str(self.value), 'FreeSans', 8, c,
                          self.x + 1*mm,
                          self.y + 1*mm)
+
         if self.down_arrow:
             c.move_to(self.x + 2*mm, self.y + self.height - 1*mm)
             c.rel_line_to(-1*mm, -6*mm)

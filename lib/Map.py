@@ -78,7 +78,6 @@ class Map:
             paper.context.set_source_surface(surface, x, y)
             paper.context.paint()
 
-
         return paper
 
     def position_of_hexag(self, row, column):
