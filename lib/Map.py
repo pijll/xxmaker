@@ -19,11 +19,14 @@ row_letters = [char for char in ".ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
 class Map:
     margin = 10*mm
 
-    def __init__(self, orientation):
+    def __init__(self, orientation, background=None, background_scale=None, background_xy=None):
         self.orientation = orientation
         self.hexags = dict()
         self.game = None
         self.elements = []
+        self.background = background
+        self.background_scale = background_scale
+        self.background_xy = background_xy
 
     def add_hexag(self, coords, hexag=None):
         row, column = coords_to_rowcolumn(coords)
@@ -51,6 +54,8 @@ class Map:
 
     def paper(self):
         paper = Paper.Paper(self.width(), self.height())
+        c = paper.context
+
         for (row, column), hexag in self.hexags.items():
             x, y = self.position_of_hexag(row, column)
 
@@ -77,6 +82,18 @@ class Map:
 
             paper.context.set_source_surface(surface, x, y)
             paper.context.paint()
+
+        if self.background:
+            try:
+                image = cairo.ImageSurface.create_from_png(self.background)
+
+                c.save()
+                c.scale(self.background_scale, self.background_scale)
+                c.set_source_surface(image, *self.background_xy)
+                c.paint_with_alpha(0.6)
+
+            except cairo.Error:
+                print(f'{cairo.Error}, filename={self.background}')
 
         return paper
 
