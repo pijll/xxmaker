@@ -15,9 +15,10 @@ class Game:
         self.papers = []
 #        self.tilesize = 38*mm   # side to side
 
-    def add_company(self, company):
-        self.companies[company.abbreviation] = company
-        company.game = self
+    def add_company(self, *companies):
+        for company in companies:
+            self.companies[company.abbreviation] = company
+            company.game = self
 
     def add_train(self, number, train):
         self.trains.append((number, train))

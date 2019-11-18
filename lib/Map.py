@@ -28,8 +28,9 @@ class Map:
         self.background_scale = background_scale
         self.background_xy = background_xy
 
-    def add_hexag(self, coords, hexag=None):
-        row, column = coords_to_rowcolumn(coords)
+    def add_hexag(self, coords=None, row=None, column=None, hexag=None):
+        if coords:
+            row, column = coords_to_rowcolumn(coords)
         self.hexags[row, column] = hexag or Hexag.empty
         self.hexags[row, column].map = self
         self.hexags[row, column].orientation = self.orientation

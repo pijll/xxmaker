@@ -132,16 +132,10 @@ class Company:
         context.stroke()
 
         context.set_source_rgb(*Colour.black.rgb)
-        # context.set_font_size(1)
-        # text_width = context.text_extents(abbreviation)[2]
-        # scaling = radius*2 / text_width
-        # context.set_font_size(scaling)
-        #
-        # x_bearing, y_bearing, width, height, *_ = context.text_extents(abbreviation)
-        #
-        # context.move_to(radius - width/2 - x_bearing, radius - height/2 - y_bearing)
-        # context.show_text(abbreviation)
-        OutputFunctions.draw_text_old(abbreviation, 'TexGyre Heros Bold', 8, context, radius, radius, 'center', 'center')
+
+        font = Font.certificate_name.made_to_fit(abbreviation,context, radius*1.6)
+
+        OutputFunctions.draw_text(abbreviation, font, context, radius, radius, 'center', 'center')
 
         return surface
 

@@ -1,12 +1,14 @@
 from gi.repository import Pango, PangoCairo
 
+
 class Font:
     default_family = 'Tex Gyre Heros'
 
-    def __init__(self, size, family=None, style=''):
+    def __init__(self, size, family=None, style='', condensed=False):
         self._family = family
         self.style = style
         self.size = size
+        self.condensed = condensed
 
     @property
     def family(self):
@@ -14,8 +16,30 @@ class Font:
 
     @property
     def description(self):
-        return Pango.FontDescription(f"{self.family} {self.style} {self.size}")
+        if self.condensed:
+            return Pango.FontDescription(f"{self.family} {self.style} Condensed {self.size}")
+        else:
+            return Pango.FontDescription(f"{self.family} {self.style} {self.size}")
 
+    def made_to_fit(self, txt, context, width):
+        layout = PangoCairo.create_layout(context)
+        layout.set_font_description(self.description)
+        layout.set_text(str(txt))
+        ink_extent, extent_text = layout.get_extents()
+        text_width = extent_text.width / Pango.SCALE
+        if text_width < width:
+            return self
+
+        font = Font(size=self.size, family=self.family, style=self.style, condensed=True)
+        layout = PangoCairo.create_layout(context)
+        layout.set_font_description(font.description)
+        layout.set_text(str(txt))
+        ink_extent, extent_text = layout.get_extents()
+        text_width = extent_text.width / Pango.SCALE
+        if text_width < width:
+            return font
+        else:
+            return Font(size=self.size * width/text_width, family=self.family, style=self.style, condensed=True)
 
 # used for tile numbers
 very_small = Font(size=5)

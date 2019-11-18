@@ -45,6 +45,8 @@ class RevenueLocation:
                     self.name_location = (-.4, 0, 'center', 'right')
                 elif self.x < -0.4:
                     self.name_location = (.4, 0, 'center', 'left')
+                elif hexag.cost:
+                    self.name_location = (0, .4, 'top', 'center')
                 else:
                     self.name_location = (0, -.4, 'bottom', 'center')
             if len(self.name_location) < 4:
