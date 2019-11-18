@@ -185,6 +185,27 @@ class Output:
             self.context.paint()
             current_x_left += tile.width
 
+        self.context.show_page()
+
+        # Tokens
+        if self.game.stockmarket and self.game.stockmarket.has_par_box:
+            tokens_per_company = 3      # stock vale; revenue chart; par value
+        else:
+            tokens_per_company = 2      # stock value; revenue chart
+
+        tokens = []
+        for company in self.game.companies.values():
+            tokens += [company.logo] * (company.n_stations + tokens_per_company)
+
+        size = 2*logo_radius + 7*mm
+        number_per_row = Page.page_width // size
+
+        for i, token in enumerate(tokens):
+            x = self.margin + (i % number_per_row) * size
+            y = self.margin + (i // number_per_row) * size
+            self.context.set_source_surface(token, x, y)
+            self.context.paint()
+
         self.surface.finish()
         subprocess.run(['ps2pdf', 'out.ps'])
 

@@ -7,7 +7,9 @@ import OutputFunctions
 class Stockmarket:
     margin = 10*mm
 
-    def __init__(self, cells):
+    def __init__(self, cells, has_par_box=False):
+        self.has_par_box = has_par_box
+
         self.cells = dict()
         for i, row in enumerate(cells):
             for j, val in enumerate(row):
