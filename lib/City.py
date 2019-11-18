@@ -1,9 +1,10 @@
-from Output import mm
-import Output
+from Definitions import mm
+import OutputFunctions
 import Colour
 from math import pi
 import math
 import Company
+import Font
 
 
 class RevenueLocation:
@@ -29,7 +30,7 @@ class RevenueLocation:
         y = (self.y + self.value_location[1]) * hexag.unit_length
         c = hexag.context
         Colour.black.use_in_context(c)
-        Output.draw_text(str(self.value), 'FreeSans', 7, c, x, y, 'center', 'center')
+        OutputFunctions.draw_text(self.value, Font.city_value, c, x, y, 'exactcenter', 'exactcenter')
         c.stroke()
         c.set_line_width(1)
         c.arc(x, y, 3 * mm, 0, 2 * pi)
@@ -48,10 +49,10 @@ class RevenueLocation:
                     self.name_location = (0, -.4, 'bottom', 'center')
             if len(self.name_location) < 4:
                 self.name_location += ('center', 'center')
-            Output.draw_text(self.name, 'FreeSans Italic', 8, c,
-                             (self.x+self.name_location[0]) * hexag.unit_length,
-                             (self.y + self.name_location[1]) * hexag.unit_length,
-                             valign=self.name_location[2], halign=self.name_location[3])
+            OutputFunctions.draw_text(self.name, Font.city_names, c,
+                                          (self.x+self.name_location[0]) * hexag.unit_length,
+                                          (self.y + self.name_location[1]) * hexag.unit_length,
+                                          valign=self.name_location[2], halign=self.name_location[3])
             c.stroke()
 
 

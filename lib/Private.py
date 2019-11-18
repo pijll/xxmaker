@@ -1,8 +1,9 @@
 import Paper
 from Output import mm
 import cairo
-import Output
+import OutputFunctions
 import Colour
+import Font
 
 
 class Private:
@@ -32,29 +33,32 @@ class Private:
         #        c.move_to(10*mm, 10*mm)
         #        c.show_text(self.name)
 
-        Output.draw_centered_lines(self.name, 'Tex Gyre Schola bold', 8, c,
-                                   x_c=(paper.width + 16 * mm) / 2, y=14 * mm,
-                                   width=paper.width - 16 * mm - 6 * mm)
+        OutputFunctions.draw_centered_lines(self.name, Font.certificate_name, c,
+                                                x_c=(paper.width + 16*mm)/2, y=14 * mm,
+                                                width=paper.width - 16*mm - 6*mm)
+
 
         c.set_source_rgb(*Colour.black.rgb)
         c.set_font_size(7*mm)
         c.select_font_face('sans-serif', cairo.FONT_SLANT_NORMAL, cairo.FONT_SLANT_NORMAL)
-        Output.move_to_text(c, self.price, paper.width - 3*mm, 3*mm, 'top', 'right')
+        OutputFunctions.move_to_text(c, self.price, paper.width - 3*mm, 3*mm, 'top', 'right')
         c.show_text(self.price)
 
         if self.image:
             filename = '../../../graphics/trains/' + self.image
-            Output.load_image(filename, c, x_c=(paper.width+16*mm)/2, y_c=(paper.height+10*mm)/2,
+            OutputFunctions.load_image(filename, c, x_c=(paper.width+16*mm)/2, y_c=(paper.height+10*mm)/2,
                               width=paper.width - 19*mm, height=paper.height - 13*mm)
 
         paper.context.move_to(40*mm, 25*mm)
         paper.context.show_text(self.revenue)
 
-        paper.context.move_to(40*mm, 30*mm)
-        paper.context.show_text(self.action1)
+        if self.action1:
+            OutputFunctions.draw_text(self.action1, Font.very_small, paper.context, x=(paper.width + 16*mm)/2, y=25*mm,
+                                      halign='center')
 
-        paper.context.move_to(40*mm, 35*mm)
-        paper.context.show_text(self.action2)
+        if self.action2:
+            OutputFunctions.draw_text(self.action2, Font.very_small, paper.context, x=(paper.width + 16*mm)/2, y=30*mm,
+                                      halign='center')
 
 
         return paper

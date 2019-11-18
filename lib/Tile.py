@@ -6,6 +6,7 @@ from City import Town, City, DoubleCity
 import Hexag
 from Hexag import Connect
 import OutputFunctions
+import Font
 
 # Distance from flat side to flat side
 tile_size = 38*mm
@@ -47,8 +48,9 @@ class Tile:
 
         self.context.set_source_rgb(*Colour.black.rgb)
         self.context.move_to(0.25 * self.hexag.side_length, 0.8 * self.hexag.side_length)
-        OutputFunctions.draw_text(str(self.number), 'FreeSans', 5, self.context,
-                                  self.hexag.unit_length/(3**.5), self.hexag.unit_length, valign='bottom', halign='right')
+        OutputFunctions.draw_text(self.number, Font.very_small, self.context,
+                                  x=self.hexag.unit_length / (3**.5), y=self.hexag.unit_length,
+                                  valign='bottom', halign='right')
 
         return self.surface
 

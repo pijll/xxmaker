@@ -53,7 +53,7 @@ class RoundIndicator:
             context.set_source_rgb(*Colour.black.rgb)
             context.stroke()
 
-            OutputFunctions.draw_text(txt, 'Freesans', 10, context, x, y, 'center', 'center')
+            OutputFunctions.draw_text_old(txt, 'Freesans', 10, context, x, y, 'center', 'center')
             context.stroke()
 
             # arrow

@@ -1,8 +1,9 @@
 import cairo
 import Paper
-from Output import mm
-import Output
+from Definitions import mm
+import OutputFunctions
 import Colour
+import Font
 
 
 logo_radius = 5.5*mm
@@ -48,7 +49,7 @@ class Company:
             c.set_source_rgb(*Colour.black.rgb)
         else:
             c.set_source_rgb(*Colour.white.rgb)
-        Output.draw_text(self.name, 'Tex Gyre Schola bold', height_namebar/3, c, width/2 + height_tokenbar/2, margin + height_namebar/2,
+        OutputFunctions.draw_text(self.name, Font.charter_name, c, width / 2 + height_tokenbar / 2, margin + height_namebar / 2,
                          'center', 'center')
         self.paint_logo(c, margin + height_namebar/2, margin + height_namebar/2)
 
@@ -69,7 +70,7 @@ class Company:
             except IndexError:
                 token_cost = token_costs[-1]
             if token_cost:
-                Output.draw_text(f'{self.game.currency}{token_cost}', 'FreeSans', 8, c, x, y+logo_radius, 'top', 'center')
+                OutputFunctions.draw_text_old(f'{self.game.currency}{token_cost}', 'FreeSans', 8, c, x, y + logo_radius, 'top', 'center')
                 c.stroke()
 
         return charter
@@ -93,18 +94,15 @@ class Company:
 
         c.set_source_rgb(*Colour.black.rgb)
 
-#        c.move_to(10*mm, 10*mm)
-#        c.show_text(self.name)
-
-        Output.draw_centered_lines(self.name, 'Tex Gyre Schola bold', 8, c,
-                                   x_c=(share.width + 16*mm)/2, y=14 * mm,
-                                   width=share.width - 16*mm - 6*mm)
+        OutputFunctions.draw_centered_lines(self.name, Font.certificate_name, c,
+                                                x_c=(share.width + 16*mm)/2, y=14 * mm,
+                                                width=share.width - 16*mm - 6*mm)
 
         number_of_shares = 'Two shares' if director else 'One share'
-        Output.draw_text(number_of_shares, "Tex Gyre Schola", 7, c,
-                         x=19*mm, y=share.height-3*mm, valign='bottom', halign='left')
-        Output.draw_text(f"{percentage}%", "Tex Gyre Schola", 7, c,
-                         x=share.width-3*mm, y=share.height-3*mm, valign='bottom', halign='right')
+        OutputFunctions.draw_text_old(number_of_shares, "Tex Gyre Schola", 7, c,
+                                      x=19*mm, y=share.height-3*mm, valign='bottom', halign='left')
+        OutputFunctions.draw_text_old(f"{percentage}%", "Tex Gyre Schola", 7, c,
+                                      x=share.width-3*mm, y=share.height-3*mm, valign='bottom', halign='right')
 
         self.paint_logo(c, 9.5*mm, 11.5*mm)
         if director:
@@ -118,7 +116,7 @@ class Company:
         context.set_source_rgb(*Colour.white.rgb)
         context.arc(radius, radius, radius, 0, 6.29)
         context.fill()
-        Output.load_image(logo_file, context, radius, radius, radius * 1.9, radius * 1.9, circle_clip=True)
+        OutputFunctions.load_image(logo_file, context, radius, radius, radius * 1.9, radius * 1.9, circle_clip=True)
         return surface
 
     def _make_logo_from_abbrev(self, abbreviation, radius):
@@ -127,6 +125,11 @@ class Company:
         context.set_source_rgb(*Colour.white.rgb)
         context.arc(radius, radius, radius, 0, 6.29)
         context.fill()
+
+        context.set_line_width(1)
+        context.set_source_rgb(*self.colour.rgb)
+        context.arc(radius, radius, radius*0.9, 0, 6.29)
+        context.stroke()
 
         context.set_source_rgb(*Colour.black.rgb)
         # context.set_font_size(1)
@@ -138,18 +141,10 @@ class Company:
         #
         # context.move_to(radius - width/2 - x_bearing, radius - height/2 - y_bearing)
         # context.show_text(abbreviation)
-        Output.draw_text(abbreviation, 'TexGyre Heros Bold', 8, context, radius, radius, 'center', 'center')
+        OutputFunctions.draw_text_old(abbreviation, 'TexGyre Heros Bold', 8, context, radius, radius, 'center', 'center')
 
         return surface
 
     def paint_logo(self, context, xc, yc):
         context.set_source_surface(self.logo, xc - logo_radius, yc-logo_radius)
         context.paint()
-
-#
-# class ShareCertificate:
-#     def __init__(self, company, percentage, director=False):
-#         self.company = company,
-#         self.percentage = percentage
-#         self.director = director
-#

@@ -1,11 +1,11 @@
 import Tile
 import Hexag
 import Paper
-from Output import mm
+from Definitions import *
 import Colour
 from math import sqrt
 import cairo
-import Output
+import OutputFunctions
 from gi.repository import Pango, PangoCairo, fontconfig
 
 
@@ -58,9 +58,9 @@ class Map:
             paper.context.paint()
 
         paper.context.set_source_rgb(*Colour.black.rgb)
-        Output.draw_text(self.game.name, 'Sancreek', 40, paper.context, 30, 20)
+        OutputFunctions.draw_text_old(self.game.name, 'Sancreek', 40, paper.context, 30, 20)
         if self.game.author:
-            Output.draw_text(self.game.author, 'FreeSans', 10, paper.context, 100, 20)
+            OutputFunctions.draw_text_old(self.game.author, 'FreeSans', 10, paper.context, 100, 20)
         paper.context.stroke()
 
         for element, location in self.elements:

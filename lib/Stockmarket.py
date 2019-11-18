@@ -1,7 +1,7 @@
 import Paper
-from Output import mm
+from Definitions import mm
 import Colour
-import Output
+import OutputFunctions
 
 
 class Stockmarket:
@@ -89,9 +89,9 @@ class Cell:
             c.fill()
 
         c.set_source_rgb(*Colour.black.rgb)
-        Output.draw_text(str(self.value), 'FreeSans', 8, c,
-                         self.x + 1*mm,
-                         self.y + 1*mm)
+        OutputFunctions.draw_text_old(str(self.value), 'FreeSans', 8, c,
+                                      self.x + 1 * mm,
+                                      self.y + 1 * mm)
 
         if self.down_arrow:
             c.move_to(self.x + 2*mm, self.y + self.height - 1*mm)

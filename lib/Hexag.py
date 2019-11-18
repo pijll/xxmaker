@@ -1,4 +1,4 @@
-import Output
+import OutputFunctions
 from Definitions import *
 import math
 from math import sqrt, pi
@@ -154,8 +154,8 @@ class Hexag:
                 x, y = self.label_location
             else:
                 x, y = (0.7, 0.05)
-            Output.draw_text(self.label, 'FreeSans Bold', 10, self.context, x * h, y * h, valign='center',
-                             halign='center')
+            OutputFunctions.draw_text_old(self.label, 'FreeSans Bold', 10, self.context, x * h, y * h, valign='center',
+                                          halign='center')
 
         if self.outline:
             vertices = self.vertices()
@@ -290,7 +290,7 @@ class External(Hexag):
             self.context.fill()
 
         if self.name:
-            Output.draw_text(self.name, 'FreeSans Italic', 8, c, 0, -.4 * h, 'center', 'center')
+            OutputFunctions.draw_text_old(self.name, 'FreeSans Italic', 8, c, 0, -.4 * h, 'center', 'center')
             c.stroke()
 
         if self.values:
@@ -307,7 +307,7 @@ class External(Hexag):
                 c.fill_preserve()
                 c.set_source_rgb(*Colour.black.rgb)
                 c.stroke()
-                Output.draw_text(str(v), 'FreeSans', 8, c, x + box_size / 2, y_c * self.unit_length, 'center', 'center')
+                OutputFunctions.draw_text_old(str(v), 'FreeSans', 8, c, x + box_size / 2, y_c * self.unit_length, 'center', 'center')
                 c.stroke()
 
         return self.surface
@@ -390,7 +390,7 @@ class Hill(Cost):
         context.set_source_rgb(*Colour.black.rgb)
         context.stroke()
 
-        Output.draw_text(str(self.cost), 'FreeSans', 8, context, x, y, 'bottom', 'center')
+        OutputFunctions.draw_text_old(str(self.cost), 'FreeSans', 8, context, x, y, 'bottom', 'center')
 
 
 class Water(Cost):
@@ -405,7 +405,7 @@ class Water(Cost):
         context.set_source_rgb(*Colour.black.rgb)
         context.stroke()
 
-        Output.draw_text(str(self.cost), 'FreeSans', 8, context, x, y, 'bottom', 'center')
+        OutputFunctions.draw_text_old(str(self.cost), 'FreeSans', 8, context, x, y, 'bottom', 'center')
 
 
 empty = Hexag()
