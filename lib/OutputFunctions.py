@@ -4,6 +4,7 @@ import Font
 
 
 def move_to_text(context, text, x, y, valign='top', halign='left'):
+    text = str(text)
     # The vertical alignment is determined by the font, not the specific text.
     # This means that a text with "tall letters" and one without them get aligned equally.
     if valign == 'top':

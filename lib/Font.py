@@ -43,10 +43,17 @@ class Font:
 
 # used for tile numbers
 very_small = Font(size=5)
+small = Font(size=6)
 
 city_names = Font(size=8, style='Italic')
 city_value = Font(size=7)
 
 certificate_name = Font(size=8, style='Bold')
-normal = Font(size=6)
+normal = Font(size=7)
 charter_name = Font(size=15, style='bold')
+
+private_revenue = Font(size=10, style='Bold')
+
+price = Font(size=15, style='Bold')
+train_letter = Font(size=20, style='Bold')
+train_rusted_by = Font(size=9)

@@ -1,3 +1,4 @@
+import Font
 import Tile
 import Hexag
 import Paper
@@ -59,9 +60,26 @@ class Map:
 
         for (row, column), hexag in self.hexags.items():
             x, y = self.position_of_hexag(row, column)
-
             paper.context.set_source_surface(hexag.draw(), int(x), y)
             paper.context.paint()
+
+        for private in self.game.privates:
+            if private.location_on_map is None:
+                continue
+            if isinstance(private.location_on_map, str):
+                row, column = coords_to_rowcolumn(private.location_on_map)
+                x, y = self.position_of_hexag(row, column)
+                c.set_line_width(1)
+                c.set_source_rgb(*Colour.black.rgb)
+                c.arc(x - 3*mm, y, 1*mm, 0, 6.29)
+                c.stroke()
+                c.arc(x + 3*mm, y, 1*mm, 0, 6.29)
+                c.move_to(x-2*mm, y)
+                c.line_to(x+2*mm, y)
+                c.stroke()
+
+                OutputFunctions.draw_text(private.abbreviation, Font.very_small, c, x, y-1*mm, 'bottom', 'center')
+                c.stroke()
 
         paper.context.set_source_rgb(*Colour.black.rgb)
         OutputFunctions.draw_text_old(self.game.name, 'Sancreek', 40, paper.context, 30, 20)

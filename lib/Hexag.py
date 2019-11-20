@@ -7,6 +7,8 @@ import cairo
 import Colour
 import City
 import Company
+import Font
+
 
 hexag_size = 40 * mm  # edge to edge
 
@@ -110,10 +112,12 @@ class Hexag:
                 if len(self.revenuelocations) == 1:
                     ct.x, ct.y = 0, 0
                 elif len(self.revenuelocations) == 2:
-                    if i == 0:
+                    if self.orientation == HORIZONTAL:
                         ct.x, ct.y = 0.6, -0.3
                     else:
-                        ct.x, ct.y = -0.6, 0.3
+                        ct.x, ct.y = 0.45, -0.3
+                    if i == 1:
+                        ct.x, ct.y = -ct.x, -ct.y
 
         for conn, colour, linewidth, draw_towns in connections_to_draw:
             if isinstance(conn.side1, str):
@@ -263,11 +267,13 @@ class External(Hexag):
     arrow_width = 0.1
     arrow_length = 0.33
 
-    def __init__(self, *args, name=None, colour=None, links=None, values=None, value_location=None, **kwargs):
+    def __init__(self, *args, name=None, colour=None, links=None, values=None, value_location=None,
+                 name_location=None, **kwargs):
         self.links = links or set()
         self.name = name
         self.values = values
         self.value_location = value_location
+        self.name_location = name_location
         super().__init__(*args, colour=colour or self.default_colour, **kwargs)
 
     def draw(self):
@@ -290,12 +296,20 @@ class External(Hexag):
             self.context.fill()
 
         if self.name:
-            OutputFunctions.draw_text_old(self.name, 'FreeSans Italic', 8, c, 0, -.4 * h, 'center', 'center')
+            if self.name_location:
+                x, y = self.name_location
+            elif self.values:
+                x, y = 0, -.4
+            else:
+                x, y = 0, 0
+            OutputFunctions.draw_text(self.name, Font.city_names, c, x*h, y*h, 'center', 'center')
             c.stroke()
 
         if self.values:
             if self.value_location:
                 x_c, y_c = self.value_location
+            elif self.name:
+                x_c, y_c = 0, 0.2
             else:
                 x_c, y_c = 0, 0
             for i, v in enumerate(self.values):
@@ -346,6 +360,9 @@ class Vertex(LocationOnHexag):
     def angle(self):
         return self._angle
 
+
+# E, SE, SW, W, NW, NE = Hexag.tile_sides(HORIZONTAL)
+# SE, S, SW, NW, N, NE = Hexag.tile_sides(VERTICAL)
 
 def tile_sides(orientation):
     if orientation == VERTICAL:

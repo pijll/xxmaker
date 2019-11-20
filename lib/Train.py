@@ -3,6 +3,7 @@ from Output import mm
 import cairo
 import OutputFunctions
 import Colour
+import Font
 
 
 class Train:
@@ -25,32 +26,20 @@ class Train:
         c.fill()
 
         c.set_source_rgb(*Colour.black.rgb)
-        # c.set_font_size(11*mm)
-        # c.select_font_face('sans-serif', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-        # Output.move_to_text(c, self.name, 6*mm, 3*mm, 'top', 'left')
-        # c.show_text(self.name)
-        OutputFunctions.draw_centered_lines_old(self.name, 'Sans bold', 20, c, 9.5 * mm, 3 * mm, 15 * mm, valign='top')
+        OutputFunctions.draw_centered_lines(self.name, Font.train_letter, c, 9.5 * mm, 7 * mm, 15 * mm, valign='center')
 
         c.set_source_rgb(*Colour.black.rgb)
-        c.set_font_size(7*mm)
-        c.select_font_face('sans-serif', cairo.FONT_SLANT_NORMAL, cairo.FONT_SLANT_NORMAL)
-        OutputFunctions.move_to_text(c, self.price, paper.width - 3*mm, 3*mm, 'top', 'right')
-        c.show_text(self.price)
+        OutputFunctions.draw_text(self.price, Font.price, c, paper.width - 3*mm, 2.8*mm, 'top', 'right')
 
         c.set_source_rgb(*Colour.black.rgb)
         c.set_font_size(3*mm)
         c.select_font_face('sans-serif', cairo.FONT_SLANT_ITALIC, cairo.FONT_SLANT_NORMAL)
 
         if self.rusted_by:
-            c.set_font_size(2.5*mm)
-            OutputFunctions.move_to_text(c, 'Rusted', 9.5*mm, paper.height - 12*mm, 'bottom', 'center')
-            c.show_text('Rusted')
-            OutputFunctions.move_to_text(c, 'by:', 9.5*mm, paper.height - 9*mm, 'bottom', 'center')
-            c.show_text('by:')
+            OutputFunctions.draw_text('Rusted',Font.small, c, 9.5*mm, paper.height - 12*mm, 'bottom', 'center')
+            OutputFunctions.draw_text('by:', Font.small, c, 9.5*mm, paper.height - 9*mm, 'bottom', 'center')
 
-            c.set_font_size(5*mm)
-            OutputFunctions.move_to_text(c, self.rusted_by, 9.5*mm, paper.height - 3*mm, 'bottom', 'center')
-            c.show_text(self.rusted_by)
+            OutputFunctions.draw_text(self.rusted_by, Font.train_rusted_by, c, 9.5*mm, paper.height - 3*mm, 'bottom', 'center')
 
         if self.image:
             filename = '../../../graphics/trains/' + self.image

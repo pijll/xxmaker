@@ -99,10 +99,10 @@ class Company:
                                                 width=share.width - 16*mm - 6*mm)
 
         number_of_shares = 'Two shares' if director else 'One share'
-        OutputFunctions.draw_text_old(number_of_shares, "Tex Gyre Schola", 7, c,
-                                      x=19*mm, y=share.height-3*mm, valign='bottom', halign='left')
-        OutputFunctions.draw_text_old(f"{percentage}%", "Tex Gyre Schola", 7, c,
-                                      x=share.width-3*mm, y=share.height-3*mm, valign='bottom', halign='right')
+        OutputFunctions.draw_text(number_of_shares, Font.normal, c,
+                                  x = 19*mm, y = share.height - 3*mm, valign='bottom', halign='left')
+        OutputFunctions.draw_text(f"{percentage}%", Font.normal, c,
+                                  x = share.width-3*mm, y = share.height - 3*mm, valign='bottom', halign='right')
 
         self.paint_logo(c, 9.5*mm, 11.5*mm)
         if director:

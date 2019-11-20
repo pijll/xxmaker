@@ -184,7 +184,7 @@ class QuadCity(City):
 
 class Town(RevenueLocation):
     length_bar = .4    # as fraction of hex unit length
-    radius = .2
+    radius = .1
     bar_width = 3 * mm
 
     def __init__(self, *args, **kwargs):
