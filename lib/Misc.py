@@ -36,6 +36,7 @@ class Name:
 
         return surface
 
+
 class RoundIndicator:
     margin = 2*mm
     minimum_space_between_circles = 10*mm

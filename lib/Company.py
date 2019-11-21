@@ -111,13 +111,7 @@ class Company:
         return share
 
     def _make_logo_from_image(self, logo_file, radius):
-        surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(0, 0, 2*radius, 2*radius))
-        context = cairo.Context(surface)
-        context.set_source_rgb(*Colour.white.rgb)
-        context.arc(radius, radius, radius, 0, 6.29)
-        context.fill()
-        OutputFunctions.load_image(logo_file, context, radius, radius, radius * 1.9, radius * 1.9, circle_clip=True)
-        return surface
+        return OutputFunctions.put_image_on_token(logo_file, radius)
 
     def _make_logo_from_abbrev(self, abbreviation, radius):
         surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(0, 0, 2 * radius, 2 * radius))

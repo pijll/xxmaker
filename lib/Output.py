@@ -5,6 +5,7 @@ from gi.repository import Pango, PangoCairo
 import math
 from Definitions import *
 import subprocess
+import OutputFunctions
 
 
 A4_WIDTH_IN_MM = 210
@@ -196,6 +197,8 @@ class Output:
         tokens = []
         for company in self.game.companies.values():
             tokens += [company.logo] * (company.n_stations + tokens_per_company)
+
+        tokens.append(OutputFunctions.put_image_on_token('../../../graphics/misc/WingedWheel.png', logo_radius))
 
         size = 2*logo_radius + 7*mm
         number_per_row = Page.page_width // size

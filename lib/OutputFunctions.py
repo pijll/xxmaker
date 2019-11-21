@@ -1,6 +1,7 @@
 from gi.repository import Pango, PangoCairo
 import cairo
 import Font
+import Colour
 
 
 def move_to_text(context, text, x, y, valign='top', halign='left'):
@@ -121,3 +122,13 @@ def load_image(filename, context, x_c, y_c, width, height, circle_clip=False):
         context.clip()
     context.paint()
     context.restore()
+
+
+def put_image_on_token(logo_file, radius):
+    surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(0, 0, 2*radius, 2*radius))
+    context = cairo.Context(surface)
+    context.set_source_rgb(*Colour.white.rgb)
+    context.arc(radius, radius, radius, 0, 6.29)
+    context.fill()
+    load_image(logo_file, context, radius, radius, radius * 1.9, radius * 1.9, circle_clip=True)
+    return surface
