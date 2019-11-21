@@ -41,6 +41,7 @@ class Font:
         else:
             return Font(size=self.size * width/text_width, family=self.family, style=self.style, condensed=True)
 
+
 # used for tile numbers
 very_small = Font(size=5)
 small = Font(size=6)
@@ -57,3 +58,6 @@ private_revenue = Font(size=10, style='Bold')
 price = Font(size=15, style='Bold')
 train_letter = Font(size=20, style='Bold')
 train_rusted_by = Font(size=9)
+
+game_name = Font(size=70, family='Tex Gyre Chorus')
+game_author = Font(size=15)

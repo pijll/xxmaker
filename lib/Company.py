@@ -13,7 +13,7 @@ class Company:
     token_costs_default = ['', 40, 100]
     token_interspace = 4*mm
 
-    def __init__(self, name, abbreviation, colour, n_stations, num_shares=10, logo=None, token_costs=None):
+    def __init__(self, name, abbreviation, colour, n_stations=0, num_shares=10, logo=None, token_costs=None):
         self.name = name
         self.abbreviation = abbreviation
         self.colour = colour

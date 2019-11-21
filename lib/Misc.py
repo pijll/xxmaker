@@ -4,8 +4,37 @@ import cairo
 import Colour
 import math
 from math import pi
+from gi.repository import Pango, PangoCairo
 import Paper
+import Font
 
+
+class Name:
+    def __init__(self, game):
+        self.game = game
+
+    def draw(self):
+        surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(0, 0, 50*mm, 25*mm))
+        context = cairo.Context(surface)
+
+        font = Font.game_name
+
+        layout = PangoCairo.create_layout(context)
+        layout.set_font_description(font.description)
+        layout.set_text(str(self.game.name))
+
+        ink_extent, extent_text = layout.get_extents()
+        text_width, text_height = ink_extent.width / Pango.SCALE, ink_extent.height / Pango.SCALE
+
+        surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(0, 0, text_width + 10*mm, text_height + 12*mm))
+        context = cairo.Context(surface)
+
+        context.set_source_rgb(*Colour.black.rgb)
+        OutputFunctions.draw_text(self.game.name, Font.game_name, context, -ink_extent.x/Pango.SCALE, -ink_extent.y/Pango.SCALE, valign='top', halign='left')
+        OutputFunctions.draw_text(self.game.author, Font.game_author, context, text_width+10*mm, text_height+2*mm,
+                                  valign='top', halign='right')
+
+        return surface
 
 class RoundIndicator:
     margin = 2*mm
@@ -87,5 +116,43 @@ def priority_deal():
                       pd.width-6*mm, pd.height-6*mm)
 
     return pd
+
+
+def trainyard(game, info):
+    train_papers = [train.paper() for _, train in game.trains]
+    height = sum(6*mm + p.height for p in train_papers)
+    width = max(100*mm + p.width for p in train_papers)
+
+    paper = Paper.Paper(width, height)
+    c = paper.context
+
+    x = 3*mm
+    y = 3*mm
+    for i, train_paper in enumerate(train_papers):
+        n = game.trains[i][0]
+
+        c.set_source_rgb(*Colour.black.rgb)
+        OutputFunctions.draw_text(f'{n} x', Font.Font(size=9), c, x, y, halign='left', valign='top')
+
+        c.set_source_surface(train_paper.surface, x+10*mm, y)
+        c.paint_with_alpha(0.5)
+
+        c.set_source_rgba(1, 1, 1)
+        c.set_operator(cairo.OPERATOR_HSL_COLOR)
+        c.rectangle(x+10*mm, y, train_paper.width, train_paper.height)
+        c.fill()
+
+        c.set_source_rgb(*Colour.black.rgb)
+        c.set_line_width(2)
+        c.rectangle(x+10*mm, y, train_paper.width, train_paper.height)
+        c.stroke()
+
+        train_info = info[i]
+        for j, txt in enumerate(train_info.split('\n')):
+            OutputFunctions.draw_text(txt, Font.Font(size=9), c, x+10*mm+train_paper.width+5*mm, y+j*6*mm)
+
+        y += train_paper.height + 6*mm
+
+    return paper
 
 

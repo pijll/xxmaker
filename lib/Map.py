@@ -81,12 +81,6 @@ class Map:
                 OutputFunctions.draw_text(private.abbreviation, Font.very_small, c, x, y-1*mm, 'bottom', 'center')
                 c.stroke()
 
-        paper.context.set_source_rgb(*Colour.black.rgb)
-        OutputFunctions.draw_text_old(self.game.name, 'Sancreek', 40, paper.context, 30, 20)
-        if self.game.author:
-            OutputFunctions.draw_text_old(self.game.author, 'FreeSans', 10, paper.context, 100, 20)
-        paper.context.stroke()
-
         for element, location in self.elements:
             surface = element.draw()
             extents = surface.get_extents()
