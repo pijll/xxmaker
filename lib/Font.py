@@ -60,4 +60,4 @@ train_letter = Font(size=20, style='Bold')
 train_rusted_by = Font(size=9)
 
 game_name = Font(size=70, family='Tex Gyre Chorus')
-game_author = Font(size=15)
+game_author = Font(size=15, family='Tex Gyre Chorus')

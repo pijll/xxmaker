@@ -19,7 +19,7 @@ class Hexag:
         self.size = size or hexag_size
         self.surface = None
         self.context = None
-        self.colour = colour or Colour.lightgreen
+        self.colour = colour or Colour.background
         self.outline = outline
         self.label = label
         self.label_location = label_location

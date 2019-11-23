@@ -40,12 +40,13 @@ purple = Colour(.5, .33, .5)
 
 russet = Colour(0.8, 0.33, 0.2)
 brown = Colour(0.3, 0.3, 0)
-tan = Colour(1, 1, 0.8)
+light_beige = Colour(0.9608, 0.9608, 0.8627)
 
 phase_1 = yellow
 phase_2 = green
 phase_3 = russet
 phase_4 = grey
+background = light_beige
 
 
 palette_xxpaper = {
@@ -64,10 +65,12 @@ palette_xxpaper = {
     'lightblue': (.5, .5, 1),
     'orange': (1, 0.5, 0),
     'purple': (0.6275, 0.1255, 0.9412),    # hollasch/purple
+    'light_beige': (0.9608, 0.9608, 0.8627),        # hollasch/leight_beige
     'phase_1': 'yellow',
     'phase_2': 'green',
     'phase_3': 'russet',
     'phase_4': 'grey',
+    'background': 'light_beige'
 }
 
 
