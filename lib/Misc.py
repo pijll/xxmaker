@@ -148,7 +148,10 @@ def trainyard(game, info):
         c.rectangle(x+10*mm, y, train_paper.width, train_paper.height)
         c.stroke()
 
-        train_info = info[i]
+        if isinstance(info, dict):
+            train_info = info.get(game.trains[i][1].name, '')
+        else:
+            train_info = info[i]
         for j, txt in enumerate(train_info.split('\n')):
             OutputFunctions.draw_text(txt, Font.Font(size=9), c, x+10*mm+train_paper.width+5*mm, y+j*6*mm)
 

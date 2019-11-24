@@ -77,15 +77,14 @@ class Cell:
         if self.colour:
             c.set_source_rgb(*self.colour.rgb)
             c.fill_preserve()
-
-        if self.is_par:
+        elif self.is_par:
             c.set_source_rgb(*Colour.lightgreen.rgb)
             c.fill_preserve()
 
         c.set_source_rgb(*Colour.black.rgb)
         c.stroke()
 
-        if self.is_par:
+        if self.is_par and not self.colour:
             c.rectangle(self.x + 2*mm, self.y + 2*mm, self.width - 4*mm, self.height - 4*mm)
             c.set_source_rgb(*Colour.white.rgb)
             c.fill()

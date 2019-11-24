@@ -26,7 +26,9 @@ class Train:
         c.fill()
 
         c.set_source_rgb(*Colour.black.rgb)
-        OutputFunctions.draw_centered_lines(self.name, Font.train_letter, c, 9.5 * mm, 7 * mm, 15 * mm, valign='center')
+        font = Font.train_letter.made_to_fit(self.name, c, 12.5*mm)
+        #OutputFunctions.draw_centered_lines(self.name, Font.train_letter, c, 9.5 * mm, 7 * mm, 15 * mm, valign='center')
+        OutputFunctions.draw_text(self.name, font, c, 9.5*mm, 7*mm, valign='center', halign='center')
 
         c.set_source_rgb(*Colour.black.rgb)
         OutputFunctions.draw_text(self.price, Font.price, c, paper.width - 3*mm, 2.8*mm, 'top', 'right')

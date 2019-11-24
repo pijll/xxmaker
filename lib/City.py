@@ -211,3 +211,7 @@ class Town(RevenueLocation):
 
             if self.value_location is None:
                 self.value_location = (dx_bar*1.2, dy_bar*1.2)
+
+
+class Port(City):
+    pass

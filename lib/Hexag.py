@@ -137,9 +137,27 @@ class Hexag:
 
             arc(self, p, q, towns)
 
-            self.context.set_line_width(linewidth)
-            self.context.set_source_rgb(*colour.rgb)
-            self.context.stroke()
+            if colour == Colour.black and conn.trackstyle == WhiteTrack:
+                self.context.set_line_width(linewidth)
+                self.context.set_source_rgb(*colour.rgb)
+                self.context.stroke_preserve()
+                self.context.set_line_width((linewidth - 1*mm))
+                self.context.set_source_rgb(*Colour.white.rgb)
+                self.context.stroke()
+            elif colour == Colour.black and conn.trackstyle == DottedTrack:
+                self.context.set_line_width(linewidth)
+                self.context.set_source_rgb(*colour.rgb)
+                self.context.stroke_preserve()
+                self.context.save()
+                self.context.set_source_rgb(*Colour.white.rgb)
+                self.context.set_line_width((linewidth - 1*mm))
+                self.context.set_dash([1*mm])
+                self.context.stroke()
+                self.context.restore()
+            else:
+                self.context.set_line_width(linewidth)
+                self.context.set_source_rgb(*colour.rgb)
+                self.context.stroke()
 
         for i, ct in enumerate(self.revenuelocations):
             ct.draw(self)
@@ -384,6 +402,11 @@ class Connect:
         self.args = args
         self.over = over
         self.under = under
+        self.trackstyle = BlackTrack
+        if WhiteTrack in args:
+            self.trackstyle = WhiteTrack
+        elif DottedTrack in args:
+            self.trackstyle = DottedTrack
 
     @property
     def revenuelocations(self):
@@ -424,5 +447,13 @@ class Water(Cost):
 
         OutputFunctions.draw_text_old(str(self.cost), 'FreeSans', 8, context, x, y, 'bottom', 'center')
 
+
+class TrackStyle:
+    pass
+
+
+BlackTrack = TrackStyle()
+WhiteTrack = TrackStyle()
+DottedTrack = TrackStyle()
 
 empty = Hexag()
