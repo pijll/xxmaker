@@ -30,11 +30,14 @@ class Map:
         self.background_xy = background_xy
 
     def add_hexag(self, coords=None, row=None, column=None, hexag=None):
+        hexag = hexag or Hexag.empty()
         if coords:
             row, column = coords_to_rowcolumn(coords)
-        self.hexags[row, column] = hexag or Hexag.empty
-        self.hexags[row, column].map = self
-        self.hexags[row, column].orientation = self.orientation
+        self.hexags[row, column] = hexag
+        hexag.map = self
+        hexag.orientation = self.orientation
+        hexag.row = row
+        hexag.column = column
 
     def width_in_hexags(self):
         return max(column for row, column in self.hexags.keys())
@@ -62,6 +65,10 @@ class Map:
             x, y = self.position_of_hexag(row, column)
             paper.context.set_source_surface(hexag.draw(), int(x), y)
             paper.context.paint()
+
+        for hexag in self.hexags.values():
+            for border in hexag.borders:
+                border.draw(paper.context)
 
         for private in self.game.privates:
             if private.location_on_map is None:

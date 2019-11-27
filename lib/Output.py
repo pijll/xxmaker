@@ -189,21 +189,10 @@ class Output:
         self.context.show_page()
 
         # Tokens
-        if self.game.stockmarket and self.game.stockmarket.has_par_box:
-            tokens_per_company = 3      # stock vale; revenue chart; par value
-        else:
-            tokens_per_company = 2      # stock value; revenue chart
-
-        tokens = []
-        for company in self.game.companies.values():
-            tokens += [company.logo] * (company.n_stations + tokens_per_company)
-
-        tokens.append(OutputFunctions.put_image_on_token('../../../graphics/misc/WingedWheel.png', logo_radius))
-
         size = 2*logo_radius + 7*mm
         number_per_row = Page.page_width // size
 
-        for i, token in enumerate(tokens):
+        for i, token in enumerate(self.game.tokens):
             x = self.margin + (i % number_per_row) * size
             y = self.margin + (i // number_per_row) * size
             self.context.set_source_surface(token, x, y)

@@ -106,6 +106,10 @@ class RoundIndicator:
         return surface
 
 
+def round_indicator_token():
+    return OutputFunctions.put_image_on_token('../../../graphics/misc/WingedWheel.png', logo_radius)
+
+
 def priority_deal():
     pd = Paper.Paper()
 
