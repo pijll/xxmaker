@@ -5,9 +5,9 @@ import Paper
 from Definitions import *
 import Colour
 from math import sqrt
-import cairo
 import OutputFunctions
-from gi.repository import Pango, PangoCairo, fontconfig
+from Draw import LineStyle, FillStyle, TextStyle
+import Draw
 
 
 hexag_size = Hexag.hexag_size
@@ -30,11 +30,14 @@ class Map:
         self.background_xy = background_xy
 
     def add_hexag(self, coords=None, row=None, column=None, hexag=None):
+        hexag = hexag or Hexag.empty()
         if coords:
             row, column = coords_to_rowcolumn(coords)
-        self.hexags[row, column] = hexag or Hexag.empty
-        self.hexags[row, column].map = self
-        self.hexags[row, column].orientation = self.orientation
+        self.hexags[row, column] = hexag
+        hexag.map = self
+        hexag.orientation = self.orientation
+        hexag.row = row
+        hexag.column = column
 
     def width_in_hexags(self):
         return max(column for row, column in self.hexags.keys())
@@ -56,12 +59,15 @@ class Map:
 
     def paper(self):
         paper = Paper.Paper(self.width(), self.height())
-        c = paper.context
+        c = paper.canvas
 
         for (row, column), hexag in self.hexags.items():
             x, y = self.position_of_hexag(row, column)
-            paper.context.set_source_surface(hexag.draw(), int(x), y)
-            paper.context.paint()
+            paper.canvas.draw(hexag.draw(), (int(x), y))
+
+        for hexag in self.hexags.values():
+            for border in hexag.borders:
+                border.draw(paper.canvas)
 
         for private in self.game.privates:
             if private.location_on_map is None:
@@ -69,44 +75,36 @@ class Map:
             if isinstance(private.location_on_map, str):
                 row, column = coords_to_rowcolumn(private.location_on_map)
                 x, y = self.position_of_hexag(row, column)
-                c.set_line_width(1)
-                c.set_source_rgb(*Colour.black.rgb)
-                c.arc(x - 3*mm, y, 1*mm, 0, 6.29)
-                c.stroke()
-                c.arc(x + 3*mm, y, 1*mm, 0, 6.29)
-                c.move_to(x-2*mm, y)
-                c.line_to(x+2*mm, y)
-                c.stroke()
-
-                OutputFunctions.draw_text(private.abbreviation, Font.very_small, c, x, y-1*mm, 'bottom', 'center')
-                c.stroke()
+                Draw.circle(c, (x - 3*mm, y), 1*mm, LineStyle(Colour.black, 1))
+                Draw.circle(c, (x + 3*mm, y), 1*mm, LineStyle(Colour.black, 1))
+                Draw.line(c, (x-2*mm, y), (x+2*mm, y), LineStyle(Colour.black, 1))
+                Draw.text(c, (x, y-1*mm), private.abbreviation,
+                          TextStyle(Font.very_small, Colour.black, 'bottom', 'center'))
 
         for element, location in self.elements:
-            surface = element.draw()
-            extents = surface.get_extents()
+            canvas = element.draw()
             if 'top' in location:
                 y = self.margin
             elif 'bottom' in location:
-                y = self.height() - self.margin - extents.height
+                y = self.height() - self.margin - canvas.height
             if 'left' in location:
                 x = self.margin
             elif 'right' in location:
-                x = self.width() - self.margin - extents.width
+                x = self.width() - self.margin - canvas.width
 
-            paper.context.set_source_surface(surface, x, y)
-            paper.context.paint()
+            paper.canvas.draw(canvas, (x, y))
 
-        if self.background:
-            try:
-                image = cairo.ImageSurface.create_from_png(self.background)
-
-                c.save()
-                c.scale(self.background_scale, self.background_scale)
-                c.set_source_surface(image, *self.background_xy)
-                c.paint_with_alpha(0.6)
-
-            except cairo.Error:
-                print(f'{cairo.Error}, filename={self.background}')
+        # if self.background:
+        #     try:
+        #         image = cairo.ImageSurface.create_from_png(self.background)
+        #
+        #         c.save()
+        #         c.scale(self.background_scale, self.background_scale)
+        #         c.set_source_surface(image, *self.background_xy)
+        #         c.paint_with_alpha(0.6)
+        #
+        #     except cairo.Error:
+        #         print(f'{cairo.Error}, filename={self.background}')
 
         return paper
 

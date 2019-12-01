@@ -4,7 +4,8 @@ import cairo
 import OutputFunctions
 import Colour
 import Font
-
+import Draw
+from Draw import LineStyle, FillStyle, TextStyle
 
 class Private:
     colour = Colour.orange
@@ -21,36 +22,31 @@ class Private:
 
     def paper(self):
         paper = Paper.Paper()
-        c = paper.context
+        c = paper.canvas
 
-        c.set_source_rgba(*self.colour.rgb, 0.1)
-        c.paint()
+        Draw.rectangle(c, (0,0), paper.width, paper.height, FillStyle(self.colour.faded()))
+        Draw.rectangle(c, (3*mm, 0), 13*mm, paper.height, FillStyle(self.colour))
 
-        c.set_source_rgb(*self.colour.rgb)
-        c.rectangle(3 * mm, 0, 13 * mm, paper.height)
-        c.fill()
-
-        c.set_source_rgb(*Colour.black.rgb)
         OutputFunctions.draw_centered_lines(self.name, Font.certificate_name, c,
                                                 x_c=(paper.width + 16*mm)/2, y=paper.height/2,
                                                 width=paper.width - 16*mm - 6*mm)
 
-        c.set_source_rgb(*Colour.black.rgb)
-        OutputFunctions.draw_text(self.price, Font.price, c, paper.width - 3*mm, 2.8*mm, 'top', 'right')
+        Draw.text(c, (paper.width - 3*mm, 2.8*mm), self.price,
+                  TextStyle(Font.price, Colour.black, 'top', 'right'))
 
         if self.image:
             filename = self.image
             OutputFunctions.load_image(filename, c, x_c=9.5*mm, y_c=7*mm,
                               width=10*mm, height=10*mm)
 
-        OutputFunctions.draw_text('Revenue', Font.small, c, 9.5*mm, paper.height - 9*mm, 'bottom', 'center')
-        OutputFunctions.draw_text(str(self.revenue), Font.private_revenue, c, 9.5*mm, paper.height-3*mm, 'bottom', 'center')
+        Draw.text(c, (9.5*mm, paper.height - 9*mm), 'Revenue', TextStyle(Font.small, Colour.black, 'bottom', 'center'))
+        Draw.text(c, (9.5*mm, paper.height - 3*mm), self.revenue,
+                  TextStyle(Font.private_revenue, Colour.black, 'bottom', 'center'))
 
         if self.action_description:
             description_lines = reversed(self.action_description.split('\n'))
             for i, line in enumerate(description_lines):
                 y = paper.height - 2*mm - i * 3*mm
-                OutputFunctions.draw_text(line, Font.very_small, paper.context, x=(paper.width + 16*mm)/2, y=y,
-                                      halign='center', valign='bottom')
+                Draw.text(c, ((paper.width + 16*mm)/2, y), line, TextStyle(Font.very_small, Colour.black, 'bottom', 'center'))
 
         return paper

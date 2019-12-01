@@ -1,33 +1,31 @@
-import cairo
 import Paper
 import collections
-from gi.repository import Pango, PangoCairo
 import math
 from Definitions import *
-import subprocess
-import OutputFunctions
-
-
-A4_WIDTH_IN_MM = 210
-A4_HEIGHT_IN_MM = 297
-
-A4_WIDTH_IN_PT = int(A4_WIDTH_IN_MM / 25.4 * 72)
-A4_HEIGHT_IN_PT = int(A4_HEIGHT_IN_MM / 25.4 * 72)
+import Draw
+import Colour
+from Draw import LineStyle, FillStyle, TextStyle
 
 
 class PaperTooLargeException(BaseException):
     pass
 
 
-class Page:
-    page_width = 210*mm
-    page_height = 297*mm
+class PageSet:
     margin = 10*mm
 
-    def __init__(self, context, paper_width=None, paper_height=None):
-        self.context = context
-        self.paper_width = paper_width
-        self.paper_height = paper_height
+    def __init__(self, document, papers):
+        self.document = document
+        self.papers = papers
+
+        self.paper_width = papers[0].width
+        self.paper_height = papers[0].height
+        self.page_width = document.width
+        self.page_height = document.height
+
+    def add_to_document(self):
+
+
 
         # How many papers fit on the page?
         number_of_papers_portrait = int((self.page_width - 2*self.margin)/self.paper_width) * \
@@ -57,9 +55,10 @@ class Page:
         if len(papers) > self.capacity:
             raise Exception(f"{len(papers)} papers on a page with room for {self.capacity}")
 
-        self.context.save()
-        if self.orientation == LANDSCAPE:
-            self.context.transform(cairo.Matrix(0,-1,1,0,0,self.page_height))
+        # TODO
+        # self.context.save()
+        # if self.orientation == LANDSCAPE:
+        #     self.context.transform(cairo.Matrix(0,-1,1,0,0,self.page_height))
 
         self.add_register_marks()
         n_papers_per_row = int((self.width - 2*self.margin)/self.paper_width)
@@ -67,40 +66,20 @@ class Page:
             column = i//n_papers_per_row
             row = i % n_papers_per_row
 
+            self.canvas.draw(paper.canvas, self.margin + row * self.paper_width,
+                                            self.margin + column * self.paper_height)
             self.context.set_source_surface(paper.surface, self.margin + row * self.paper_width,
                                             self.margin + column * self.paper_height)
             self.context.paint()
 
-        self.context.restore()
-
-    def add_register_marks(self):
-        self.context.set_source_rgb(0, 0, 0)
-        self.context.set_line_width(1)
-
-        x = self.margin
-        while x <= self.width - self.margin:
-            self.context.move_to(x, 0)
-            self.context.line_to(x, self.margin - 2*mm)
-            self.context.move_to(x, self.height)
-            self.context.line_to(x, self.height - self.margin + 2*mm)
-            x += self.paper_width
-
-        y = self.margin
-        while y <= self.height - self.margin:
-            self.context.move_to(0, y)
-            self.context.line_to(self.margin - 2*mm, y)
-            self.context.move_to(self.width, y)
-            self.context.line_to(self.width - self.margin + 2*mm, y)
-            y += self.paper_height
-
-        self.context.stroke()
+        # self.context.restore()
 
     @classmethod
     def fits(cls, paper):
         if paper.width < cls.page_width-2*cls.margin and paper.height < cls.page_height-2*cls.margin:
             return True
         if paper.width < cls.page_height-2*cls.margin and paper.height < cls.page_width-2*cls.margin:
-            return True
+             return True
         return False
 
     @classmethod
@@ -115,20 +94,23 @@ class Page:
             for row in range(n_vertical_pages):
                 paper_part = Paper.Paper(width_map_part, height_map_part)
 
-                paper_part.context.set_source_surface(paper.surface, -column*width_map_part, -row*height_map_part)
-                paper_part.context.paint()
+                paper_part.canvas.draw(paper.canvas, (-column*width_map_part, -row*height_map_part))
+                # paper_part.context.set_source_surface(paper.surface, -column*width_map_part, -row*height_map_part)
+                # paper_part.context.paint()
                 yield paper_part
 
 
 class Output:
+    paper_width = A4_WIDTH
+    paper_height = A4_HEIGHT
+
     def __init__(self, game, margin=10*mm):
         self.game = game
         self.margin = margin
-        self.context = None
-        self.surface = None
+        self.document = None
 
     def generate(self):
-        self.create_pdf_surface()
+        self.document = Draw.Document("out.ps", self.paper_width, self.paper_height, 10*mm)
 
         papers = []
 
@@ -153,68 +135,45 @@ class Output:
 
         papers_by_dimension = collections.defaultdict(list)
         for paper in papers:
-            if Page.fits(paper):
-                papers_by_dimension[(paper.width, paper.height)].append(paper)
-            else:
-                paper_parts = list(Page.split_too_large_paper(paper))
-                papers_by_dimension[(paper_parts[0].width, paper_parts[0].height)] += paper_parts
+            paper_parts = list(paper.split_into_parts(self.document.width-2*self.margin,
+                                                      self.document.height-2*self.margin))
+            papers_by_dimension[(paper_parts[0].width, paper_parts[0].height)] += paper_parts
 
-        for (width, height), paper_list in papers_by_dimension.items():
-            while paper_list:
-                page = Page(self.context, width, height)
-                papers_on_this_page = paper_list[:page.capacity]
-                paper_list = paper_list[page.capacity:]
+        for (paper_width, paper_height), paper_list in papers_by_dimension.items():
+            self.document.add_papers(paper_list)
 
-                page.add_papers(papers_on_this_page)
-                self.context.show_page()
-
+        page = self.document.new_page()
         current_x_left = self.margin
         current_y_top = self.margin
         current_line = 0
         for tile in self.game.tiles:
-            if current_x_left + tile.width >= A4_WIDTH_IN_PT - self.margin:
+            if current_x_left + tile.width >= self.document.width - self.margin:
                 current_y_top += tile.height
                 current_line += 1
                 current_x_left = self.margin + tile.width * (current_line % 2) / 2
-                if current_y_top + tile.height >= A4_HEIGHT_IN_PT - self.margin:
-                    self.context.show_page()
+                if current_y_top + tile.height >= self.document.height - self.margin:
+                    page = self.document.new_page()
                     current_x_left = self.margin
                     current_y_top = self.margin
                     current_line = 0
 
-            self.context.set_source_surface(tile.draw(), current_x_left + tile.width/2, current_y_top+tile.height/2)
-            self.context.paint()
+            page.draw(tile.draw(), (current_x_left + tile.width/2, current_y_top+tile.height/2))
             current_x_left += tile.width
 
-        self.context.show_page()
+        page = self.document.new_page()
 
         # Tokens
-        if self.game.stockmarket and self.game.stockmarket.has_par_box:
-            tokens_per_company = 3      # stock vale; revenue chart; par value
-        else:
-            tokens_per_company = 2      # stock value; revenue chart
-
-        tokens = []
-        for company in self.game.companies.values():
-            tokens += [company.logo] * (company.n_stations + tokens_per_company)
-
-        tokens.append(OutputFunctions.put_image_on_token('../../../graphics/misc/WingedWheel.png', logo_radius))
-
         size = 2*logo_radius + 7*mm
-        number_per_row = Page.page_width // size
+        number_per_row = self.document.width // size
 
-        for i, token in enumerate(tokens):
+        for i, token in enumerate(self.game.tokens):
             x = self.margin + (i % number_per_row) * size
             y = self.margin + (i // number_per_row) * size
-            self.context.set_source_surface(token, x, y)
-            self.context.paint()
+            page.draw(token, (x, y))
 
-        self.surface.finish()
-        subprocess.run(['ps2pdf', 'out.ps'])
+        self.document.finish()
 
-    def create_pdf_surface(self):
-        self.surface = cairo.PSSurface("out.ps", A4_WIDTH_IN_PT, A4_HEIGHT_IN_PT)
-        self.context = cairo.Context(self.surface)
+
 
 #
 # # Run program fc-list to see all fonts

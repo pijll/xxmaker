@@ -14,6 +14,16 @@ class Colour:
     def use_in_context(self, context):
         context.set_source_rgb(*self.rgb)
 
+    @property
+    def contrast_colour(self):
+        if self.brightness() > 0.5:
+            return black
+        else:
+            return white
+
+    # TODO
+    def faded(self, factor=0.1):
+        return Colour(r=self.r*factor + 1-factor, g=self.g*factor + 1-factor, b=self.b*factor + 1-factor)
 
 def set_palette(palette):
     for name, rgb in palette.items():
@@ -36,6 +46,7 @@ lightgreen = Colour(.7, 1, .7)
 darkgreen = Colour(0, .4, 0)
 blue = Colour(0, 0, 1)
 lightblue = Colour(.5, .5, 1)
+darkblue = Colour(0.4157, 0.3529, 0.8039)   # hollasch slate_blue
 purple = Colour(.5, .33, .5)
 
 russet = Colour(0.8, 0.33, 0.2)
@@ -61,7 +72,7 @@ palette_xxpaper = {
     'lightgreen': (.7, 1, .7),
     'red': (1.0000, 0.0100, 0.0500),       # hollasch/cadmium_red_light
     'blue': (0.1176, 0.5647, 1.0000),      # hollasch/dodger_blue
-    'brown': (0.3, 0.3, 0),
+    'brown': (0.9569, 0.6431, 0.3765),    #sandy_brown
     'lightblue': (.5, .5, 1),
     'orange': (1, 0.5, 0),
     'purple': (0.6275, 0.1255, 0.9412),    # hollasch/purple

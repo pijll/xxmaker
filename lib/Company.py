@@ -4,6 +4,8 @@ from Definitions import mm
 import OutputFunctions
 import Colour
 import Font
+import Draw
+from Draw import FillStyle, LineStyle, TextStyle
 
 
 logo_radius = 5.5*mm
@@ -36,42 +38,29 @@ class Company:
 
         charter = Paper.Paper(width, height)
 
-        c = charter.context
+        c = charter.canvas
 
-        c.rectangle(margin, margin, width - 2*margin, height_namebar)
-        c.set_source_rgb(*self.colour.rgb)
-        c.fill_preserve()
-        c.set_source_rgb(*Colour.black.rgb)
-        c.set_line_width(1*mm)
-        c.stroke()
+        Draw.rectangle(c, (margin, margin), width - 2*margin, height_namebar, FillStyle(self.colour), LineStyle(Colour.black, 1*mm))
+        Draw.text(c, (width / 2 + height_tokenbar / 2, margin + height_namebar / 2), self.name,
+                  TextStyle(Font.charter_name, self.colour.contrast_colour, 'center', 'center'))
 
-        if self.colour.brightness() > 0.5:
-            c.set_source_rgb(*Colour.black.rgb)
-        else:
-            c.set_source_rgb(*Colour.white.rgb)
-        OutputFunctions.draw_text(self.name, Font.charter_name, c, width / 2 + height_tokenbar / 2, margin + height_namebar / 2,
-                         'center', 'center')
         self.paint_logo(c, margin + height_namebar/2, margin + height_namebar/2)
 
-        c.set_source_rgb(*Colour.black.rgb)
-        c.rectangle(margin, margin, width - 2*margin, height - 2*margin)
-        c.stroke()
+        Draw.rectangle(c, (margin, margin), width - 2*margin, height - 2*margin, LineStyle(Colour.black, 1*mm))
 
         token_costs = self.token_costs or self.token_costs_default
         for i in range(self.n_stations):
-            c.set_line_width(0.6*mm)
             x = margin + self.token_interspace*(i+1) + logo_radius*(2*i + 1)
             y = margin + height_namebar + self.token_interspace + logo_radius
-            c.arc(x, y, logo_radius, 0, 6.29)
-            c.stroke()
+            Draw.circle(c, (x,y), logo_radius, LineStyle(Colour.black, 0.6*mm))
 
             try:
                 token_cost = token_costs[i]
             except IndexError:
                 token_cost = token_costs[-1]
             if token_cost:
-                OutputFunctions.draw_text_old(f'{self.game.currency}{token_cost}', 'FreeSans', 8, c, x, y + logo_radius, 'top', 'center')
-                c.stroke()
+                Draw.text(c, (x, y+logo_radius), f'{self.game.currency}{token_cost}',
+                          TextStyle(Font.normal, Colour.black, 'top', 'center'))
 
         return charter
 
@@ -83,26 +72,20 @@ class Company:
 
     def _share_paper(self, percentage, director=False):
         share = Paper.Paper()
-        c = share.context
+        c = share.canvas
 
-        c.set_source_rgba(*self.colour.rgb, 0.1)
-        c.paint()
-
-        c.set_source_rgb(*self.colour.rgb)
-        c.rectangle(3*mm, 0, 13*mm, share.height)
-        c.fill()
-
-        c.set_source_rgb(*Colour.black.rgb)
+        Draw.rectangle(c, (0,0), share.width, share.height, FillStyle(self.colour.faded()))
+        Draw.rectangle(c, (3*mm,0), 13*mm, share.height, FillStyle(self.colour))
 
         OutputFunctions.draw_centered_lines(self.name, Font.certificate_name, c,
                                                 x_c=(share.width + 16*mm)/2, y=14 * mm,
                                                 width=share.width - 16*mm - 6*mm)
 
         number_of_shares = 'Two shares' if director else 'One share'
-        OutputFunctions.draw_text(number_of_shares, Font.normal, c,
-                                  x = 19*mm, y = share.height - 3*mm, valign='bottom', halign='left')
-        OutputFunctions.draw_text(f"{percentage}%", Font.normal, c,
-                                  x = share.width-3*mm, y = share.height - 3*mm, valign='bottom', halign='right')
+        Draw.text(c, (19*mm, share.height-3*mm), number_of_shares,
+                  TextStyle(Font.normal, Colour.black, 'bottom', 'left'))
+        Draw.text(c, (share.width-3*mm, share.height-3*mm), f'{percentage}%',
+                  TextStyle(Font.normal, Colour.black, 'bottom', 'right'))
 
         self.paint_logo(c, 9.5*mm, 11.5*mm)
         if director:
@@ -114,25 +97,16 @@ class Company:
         return OutputFunctions.put_image_on_token(logo_file, radius)
 
     def _make_logo_from_abbrev(self, abbreviation, radius):
-        surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(0, 0, 2 * radius, 2 * radius))
-        context = cairo.Context(surface)
-        context.set_source_rgb(*Colour.white.rgb)
-        context.arc(radius, radius, radius, 0, 6.29)
-        context.fill()
+        canvas = Draw.Canvas((0,0), 2*radius, 2*radius)
+        Draw.circle(canvas, (radius, radius), radius, FillStyle(Colour.white))
+        Draw.circle(canvas, (radius, radius), radius*0.9, LineStyle(self.colour, 1*mm))
 
-        context.set_line_width(1)
-        context.set_source_rgb(*self.colour.rgb)
-        context.arc(radius, radius, radius*0.9, 0, 6.29)
-        context.stroke()
+        font = Font.certificate_name.made_to_fit(abbreviation, canvas, radius*1.6)
 
-        context.set_source_rgb(*Colour.black.rgb)
+        Draw.text(canvas, (radius, radius), abbreviation,
+                  TextStyle(font, Colour.black, 'exactcenter', 'exactcenter'))
 
-        font = Font.certificate_name.made_to_fit(abbreviation,context, radius*1.6)
+        return canvas
 
-        OutputFunctions.draw_text(abbreviation, font, context, radius, radius, 'center', 'center')
-
-        return surface
-
-    def paint_logo(self, context, xc, yc):
-        context.set_source_surface(self.logo, xc - logo_radius, yc-logo_radius)
-        context.paint()
+    def paint_logo(self, canvas, xc, yc):
+        canvas.draw(self.logo, (xc - logo_radius, yc-logo_radius))

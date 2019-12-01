@@ -2,6 +2,9 @@ import Paper
 from Definitions import mm
 import Colour
 import OutputFunctions
+import Draw
+from Draw import LineStyle, FillStyle, TextStyle
+import Font
 
 
 class Stockmarket:
@@ -35,18 +38,14 @@ class Stockmarket:
 
     def paper(self):
         paper = Paper.Paper(self.width*Cell.width+2*self.margin, self.height*Cell.height+2*self.margin)
-        c = paper.context
-        c.set_source_rgb(*Colour.black.rgb)
-        c.set_line_width(1)
+        c = paper.canvas
         for cell in self.cells.values():
-            cell.draw(paper.context)
+            cell.draw(c)
 
         if self.current_round_marker:
             round_surface = self.current_round_marker.draw()
-            extents = round_surface.get_extents()
-            c.set_source_surface(round_surface, paper.width - self.margin - extents.width,
-                                 paper.height - self.margin - extents.height)
-            c.paint()
+            c.draw(round_surface, (paper.width - self.margin - round_surface.width,
+                                   paper.height - self.margin - round_surface.height))
 
         return paper
 
@@ -73,38 +72,46 @@ class Cell:
         return self.row * self.height + Stockmarket.margin
 
     def draw(self, c):
-        c.rectangle(self.x, self.y, self.width, self.height)
         if self.colour:
-            c.set_source_rgb(*self.colour.rgb)
-            c.fill_preserve()
+            Draw.rectangle(c, (self.x, self.y), self.width, self.height,
+                           FillStyle(self.colour), LineStyle(Colour.black, 1))
         elif self.is_par:
-            c.set_source_rgb(*Colour.lightgreen.rgb)
-            c.fill_preserve()
-
-        c.set_source_rgb(*Colour.black.rgb)
-        c.stroke()
+            Draw.rectangle(c, (self.x, self.y), self.width, self.height,
+                           FillStyle(Colour.lightgreen), LineStyle(Colour.black, 1))
+        else:
+            Draw.rectangle(c, (self.x, self.y), self.width, self.height,
+                           LineStyle(Colour.black, 1))
 
         if self.is_par and not self.colour:
-            c.rectangle(self.x + 2*mm, self.y + 2*mm, self.width - 4*mm, self.height - 4*mm)
-            c.set_source_rgb(*Colour.white.rgb)
-            c.fill()
+            Draw.rectangle(c, (self.x + 2*mm, self.y + 2*mm), self.width - 4*mm, self.height - 4*mm,
+                           FillStyle(Colour.white))
 
-        c.set_source_rgb(*Colour.black.rgb)
-        OutputFunctions.draw_text_old(str(self.value), 'FreeSans', 8, c,
-                                      self.x + 1 * mm,
-                                      self.y + 1 * mm)
+        text_colour = self.colour.contrast_colour if self.colour else Colour.black
+        Draw.text(c, (self.x+1*mm, self.y+1*mm), self.value, TextStyle(Font.normal, text_colour))
 
         if self.down_arrow:
-            c.move_to(self.x + 2*mm, self.y + self.height - 1*mm)
-            c.rel_line_to(-1*mm, -6*mm)
-            c.rel_line_to(1*mm, 1.5*mm)
-            c.rel_line_to(1*mm, -1.5*mm)
-            c.close_path()
-            c.fill()
+            x, y = self.x+2*mm, self.y + self.height - 1*mm
+            points = [[x, y],
+                      [x-1*mm, y-6*mm],
+                      [x, y-4.5*mm],
+                      [x+1*mm, y-6*mm]]
+            Draw.polygon(c, points, FillStyle(Colour.black))
+            # c.move_to(self.x + 2*mm, self.y + self.height - 1*mm)
+            # c.rel_line_to(-1*mm, -6*mm)
+            # c.rel_line_to(1*mm, 1.5*mm)
+            # c.rel_line_to(1*mm, -1.5*mm)
+            # c.close_path()
+            # c.fill()
         if self.up_arrow:
-            c.move_to(self.x + self.width - 2*mm, self.y + 1*mm)
-            c.rel_line_to(-1*mm, 6*mm)
-            c.rel_line_to(1*mm, -1.5*mm)
-            c.rel_line_to(1*mm, 1.5*mm)
-            c.close_path()
-            c.fill()
+            x, y = self.x + self.width-2*mm, self.y+1*mm
+            points = [[x, y],
+                      [x-1*mm, y+6*mm],
+                      [x, y+4.5*mm],
+                      [x+1*mm, y+6*mm]]
+            Draw.polygon(c, points, FillStyle(Colour.black))
+            # c.move_to(self.x + self.width - 2*mm, self.y + 1*mm)
+            # c.rel_line_to(-1*mm, 6*mm)
+            # c.rel_line_to(1*mm, -1.5*mm)
+            # c.rel_line_to(1*mm, 1.5*mm)
+            # c.close_path()
+            # c.fill()

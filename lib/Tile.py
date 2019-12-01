@@ -7,6 +7,9 @@ import Hexag
 from Hexag import Connect, WhiteTrack, DottedTrack
 import OutputFunctions
 import Font
+import Draw
+from Draw import LineStyle, FillStyle, TextStyle
+
 
 # Distance from flat side to flat side
 tile_size = 38*mm
@@ -21,9 +24,7 @@ class Tile:
         self.args = args
 
         self.hexag = Hexag.Hexag(*args, colour=colour, size=tile_size, outline=False, orientation=VERTICAL, **kwargs)
-
-        self.surface = None
-        self.context = None
+        self.canvas = None
 
         Tile.all[number] = self
 
@@ -40,19 +41,15 @@ class Tile:
         return tile_size
 
     def draw(self):
-        if self.surface:
-            return self.surface
+        if self.canvas:
+            return self.canvas
 
-        self.surface = self.hexag.draw()
-        self.context = self.hexag.context
+        self.canvas = self.hexag.draw()
 
-        self.context.set_source_rgb(*Colour.black.rgb)
-        self.context.move_to(0.25 * self.hexag.side_length, 0.8 * self.hexag.side_length)
-        OutputFunctions.draw_text(self.number, Font.very_small, self.context,
-                                  x=self.hexag.unit_length / (3**.5), y=self.hexag.unit_length,
-                                  valign='bottom', halign='right')
+        Draw.text(self.canvas, (self.hexag.unit_length / (3**.5), self.hexag.unit_length), self.number,
+                  TextStyle(Font.very_small, Colour.black, 'bottom', 'right'))
 
-        return self.surface
+        return self.canvas
 
 
 SE, S, SW, NW, N, NE = Hexag.tile_sides(Hexag.VERTICAL)
@@ -143,7 +140,7 @@ Tile(646, Colour.phase_3, Connect(N, SW, DottedTrack), Connect(SW, SE, DottedTra
 Tile(647, Colour.phase_3, Connect(S, SW, DottedTrack), Connect(SE, S, DottedTrack), Connect(SE, SW, DottedTrack))
 Tile(648, Colour.phase_3, Connect(N, NW, DottedTrack), Connect(NW, SE, DottedTrack), Connect(SE, N, DottedTrack))
 Tile(649, Colour.phase_3, Connect(NW, SW, DottedTrack), Connect(SW, SE, DottedTrack), Connect(SE, NW, DottedTrack))
-Tile(650, Colour.phase_2, Connect(S, SE), Connect(S, SW), DottedTrack)
+Tile(650, Colour.phase_2, Connect(S, SE, DottedTrack), Connect(S, SW, DottedTrack))
 Tile(651, Colour.phase_2, Connect(NW, SE, DoubleCity('A', value=90)), Connect('A', N),
      Connect('A', SW, DottedTrack), Connect('A', S, DottedTrack), label='P')
 Tile(652, Colour.phase_3, Connect(NW, SE, DoubleCity('A', value=130), WhiteTrack), Connect('A', N),
@@ -182,7 +179,7 @@ Tile(673, Colour.phase_3, Connect(NW, SE, WhiteTrack, DoubleCity('A', value=40))
      Connect('A', S, WhiteTrack))
 Tile(674, Colour.phase_3, Connect(NW, SE, WhiteTrack, DoubleCity('A', value=40)), Connect('A', SW, WhiteTrack),
      Connect('A', N, WhiteTrack))
-Tile(675, Colour.phase_2, DoubleCity('A', value=20), Connect('A', N), Connect('A', SW),
+Tile(675, Colour.phase_2, City('A', value=20), Connect('A', N), Connect('A', SW),
      Connect('A', NW, DottedTrack), label='S')
 Tile(676, Colour.phase_3, DoubleCity('A', value=30), Connect('A', SW, WhiteTrack), Connect('A', NW, WhiteTrack),
      Connect('A', N), label='S')
@@ -213,16 +210,17 @@ Tile(690, Colour.phase_2, Town('A', value=10), Connect('A', NW), Connect('A', SE
      Connect('A', N, DottedTrack), Connect('A', S, DottedTrack))
 Tile(691, Colour.phase_2, Town('A', value=10), Connect('A', N), Connect('A', S),
      Connect('A', SE, DottedTrack), Connect('A', NW, DottedTrack))
-Tile(692, Colour.phase_2, Connect(SE, NW), Connect(SE, NE))
-Tile(693, Colour.phase_2, Connect(SE, NW), Connect(SE, S))
-Tile(694, Colour.phase_2, Connect(SE, N), Connect(SE, NW))
-Tile(695, Colour.phase_2, Connect(SE, SW), Connect(SE, S))
-Tile(696, Colour.phase_3, Connect(N, S, WhiteTrack, Town(value=20)), Connect(NW, SE, WhiteTrack))
-Tile(697, Colour.phase_3, Connect(NW, SE, WhiteTrack, Town('A', value=20)), Connect('A', S, WhiteTrack),
-     Connect('A', SW, WhiteTrack))
-Tile(698, Colour.phase_3, Connect(NW, SE, WhiteTrack, Town('A', value=20)), Connect('A', N, WhiteTrack),
-     Connect('A', SW, WhiteTrack))
-Tile(699, Colour.phase_2, Connect(SE, SW), Connect(SE, N))
+Tile(692, Colour.phase_2, Connect(SE, NW, DottedTrack), Connect(SE, NE, DottedTrack))
+Tile(693, Colour.phase_2, Connect(SE, NW, DottedTrack), Connect(SE, S, DottedTrack))
+Tile(694, Colour.phase_2, Connect(SE, N, DottedTrack), Connect(SE, NE, DottedTrack))
+Tile(695, Colour.phase_2, Connect(SE, SW, DottedTrack), Connect(SE, S, DottedTrack))
+Tile(696, Colour.phase_3, Town('A', value=20), Connect(N, 'A', WhiteTrack), Connect(NW, 'A', WhiteTrack),
+     Connect(S, 'A', WhiteTrack), Connect(SE, 'A', WhiteTrack))
+Tile(697, Colour.phase_3, Town('A', value=20), Connect(SW, 'A', WhiteTrack), Connect(NW, 'A', WhiteTrack),
+     Connect(S, 'A', WhiteTrack), Connect(SE, 'A', WhiteTrack))
+Tile(698, Colour.phase_3, Town('A', value=20), Connect(N, 'A', WhiteTrack), Connect(NW, 'A', WhiteTrack),
+     Connect(SW, 'A', WhiteTrack), Connect(SE, 'A', WhiteTrack))
+Tile(699, Colour.phase_2, Connect(SE, SW, DottedTrack), Connect(SE, N, DottedTrack))
 Tile(700, Colour.phase_2, Town('A', value=10), Connect('A', SW), Connect('A', SE),
      Connect('A', NW, DottedTrack), Connect('A', S, DottedTrack))
 Tile(701, Colour.phase_2, Town('A', value=10), Connect('A', SE), Connect('A', S),
@@ -237,15 +235,15 @@ Tile(705, Colour.phase_2, DoubleCity('A', value=30), Connect('A', SE), Connect('
      Connect('A', NW, DottedTrack), Connect('A', SW, DottedTrack))
 Tile(706, Colour.phase_2, DoubleCity('A', value=30), Connect('A', SW), Connect('A', NW),
      Connect('A', S, DottedTrack), Connect('A', SE, DottedTrack))
-Tile(707, Colour.phase_2, DoubleCity('A', value=30), Connect('A', NW), Connect('A', N),
+Tile(707, Colour.phase_2, DoubleCity('A', value=30), Connect('A', NW), Connect('A', S),
      Connect('A', SE, DottedTrack), Connect('A', SW, DottedTrack))
 Tile(708, Colour.phase_2, Connect(SE, N, DottedTrack), Connect(SE, S, DottedTrack))
 Tile(709, Colour.phase_2, Connect(SE, NE, DottedTrack), Connect(SE, SW, DottedTrack))
-Tile(710, Colour.phase_2, Connect(S, NE), Connect(N, SE, DottedTrack))
-Tile(711, Colour.phase_2, Connect(S, NE), Connect(SE, NW, DottedTrack))
-Tile(712, Colour.phase_2, Connect(N, SE), Connect(S, NE, DottedTrack))
-Tile(713, Colour.phase_2, Connect(NW, SE), Connect(S, NE, DottedTrack))
-Tile(714, Colour.phase_2, Connect(NW, SE), Connect(S, N, DottedTrack))
-Tile(715, Colour.phase_2, Connect(N, S), Connect(SE, NW, DottedTrack))
+Tile(710, Colour.phase_2, Connect(S, NE, over=True), Connect(N, SE, DottedTrack, under=True))
+Tile(711, Colour.phase_2, Connect(S, NE, under=True), Connect(SE, NW, DottedTrack, over=True))
+Tile(712, Colour.phase_2, Connect(N, SE, under=True), Connect(S, NE, DottedTrack, over=True))
+Tile(713, Colour.phase_2, Connect(NW, SE, over=True), Connect(S, NE, DottedTrack, under=True))
+Tile(714, Colour.phase_2, Connect(NW, SE, under=True), Connect(S, N, DottedTrack, over=True))
+Tile(715, Colour.phase_2, Connect(N, S, over=True), Connect(SE, NW, DottedTrack, under=True))
 
 
