@@ -1,8 +1,5 @@
-#from Output import mm
-
-
 class Game:
-    def __init__(self, name, author, currency=''):
+    def __init__(self, name, author, license_file, currency=''):
         self.name = name
         self.companies = {}
         self.trains = []
@@ -14,6 +11,13 @@ class Game:
         self.currency = currency
         self.papers = []
         self._tokens = []
+
+        try:
+            with open(license_file) as infile:
+                license_txt = infile.read()
+        except OSError:
+            raise Exception(f"No license file found ('{license_file}')") from None
+        self.license = license_txt
 
     def add_company(self, *companies):
         for company in companies:

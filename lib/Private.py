@@ -36,8 +36,7 @@ class Private:
 
         if self.image:
             filename = self.image
-            OutputFunctions.load_image(filename, c, x_c=9.5*mm, y_c=7*mm,
-                              width=10*mm, height=10*mm)
+            Draw.load_image(c, filename, (9.5*mm, 7*mm), width=10*mm, height=10*mm)
 
         Draw.text(c, (9.5*mm, paper.height - 9*mm), 'Revenue', TextStyle(Font.small, Colour.black, 'bottom', 'center'))
         Draw.text(c, (9.5*mm, paper.height - 3*mm), self.revenue,

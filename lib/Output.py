@@ -5,6 +5,7 @@ from Definitions import *
 import Draw
 import Colour
 from Draw import LineStyle, FillStyle, TextStyle
+import Font
 
 
 class Output:
@@ -78,4 +79,14 @@ class Output:
             y = self.margin + (i // number_per_row) * size
             page.draw(token, (x, y))
 
+        self.create_license_page()
         self.document.finish()
+
+    def create_license_page(self):
+        page = self.document.new_page()
+        x = self.margin
+        y = self.margin
+        for license_txt in [self.game.license] + list(self.document.license_info.values()):
+            for line_of_text in license_txt.split('\n'):
+                Draw.text(page, (x, y), line_of_text, TextStyle(Font.small, Colour.black))
+                y += 3*mm

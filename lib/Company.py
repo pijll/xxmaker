@@ -23,7 +23,7 @@ class Company:
         self.num_shares = num_shares
         self.token_costs = token_costs
         if logo:
-            self.logo = self._make_logo_from_image('../../../graphics/companies/' + logo, radius=logo_radius)
+            self.logo = self._make_logo_from_image('companies/' + logo, radius=logo_radius)
         else:
             self.logo = self._make_logo_from_abbrev(self.abbreviation, radius=logo_radius)
         self.game = None

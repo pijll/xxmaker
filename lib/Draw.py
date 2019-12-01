@@ -3,6 +3,8 @@ from gi.repository import Pango, PangoCairo
 from Definitions import *
 import subprocess
 import Colour
+import os
+import Font
 
 
 end_cap_round = object()
@@ -20,8 +22,13 @@ class Canvas:
         self.surface = surface or cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(*corner, width, height))
         self.context = context or cairo.Context(self.surface)
 
+        self.license_info = {}
+
     def draw(self, canvas, location, black_and_white=False, alpha=None, rotated=False):
         """Paint one canvas on the other, at location x,y = location."""
+        # Copy license info to this canvas
+        self.license_info.update(canvas.license_info)
+
         if rotated:
             source_canvas = Canvas((0, 0), canvas.height, canvas.width)
             source_canvas.context.translate(canvas.height, 0)
@@ -47,6 +54,7 @@ class Canvas:
 class Page(Canvas):
     def __init__(self, document):
         super().__init__((0, 0), document.width, document.height, document.surface, document.context)
+        self.license_info = document.license_info
 
     def add_register_marks(self, paper_width, paper_height, margin):
         x = margin
@@ -72,6 +80,7 @@ class Document:
         self.surface = cairo.PSSurface(filename, width, height)
         self.context = cairo.Context(self.surface)
         self.number_of_pages = 0
+        self.license_info = {}
 
     def new_page(self):
         if self.number_of_pages > 0:
@@ -248,11 +257,23 @@ def text(canvas, location, txt, textstyle):
 
 
 def load_image(canvas, filename, center, width, height, circle_clip=False):
+    """Filename should be relative to the graphics directory."""
+    home_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    complete_filename = os.path.join(home_dir, 'graphics', filename)
     try:
-        image = cairo.ImageSurface.create_from_png(filename)
+        image = cairo.ImageSurface.create_from_png(complete_filename)
     except cairo.Error:
         print(f'{cairo.Error}, filename={filename}')
-        return
+        return False
+
+    license_file = complete_filename + '.txt'
+    try:
+        with open(license_file) as infile:
+            license_txt = infile.read()
+    except OSError:
+        raise Exception(f"No license file found for file '{filename}'") from None
+
+    canvas.license_info[filename] = license_txt
 
     img_width = image.get_width()
     img_height = image.get_height()
@@ -268,3 +289,4 @@ def load_image(canvas, filename, center, width, height, circle_clip=False):
         context.clip()
     context.paint()
     context.restore()
+    return True
