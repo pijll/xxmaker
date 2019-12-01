@@ -7,18 +7,20 @@ from Draw import LineStyle, FillStyle, TextStyle
 
 
 class Train:
-    def __init__(self, name, colour, price, image=None, rusted_by=None):
+    def __init__(self, name, colour, price, image=None, rusted_by=None, exchange_price=None, text=None):
         self.name = name
         self.colour = colour
         self.price = price
         self.image = image
         self.rusted_by = rusted_by
+        self.exchange_price = exchange_price
+        self.text = text
 
     def paper(self):
         paper = Paper.Paper()
         c = paper.canvas
 
-        Draw.rectangle(c, (0,0), paper.width, paper.height, FillStyle(self.colour.faded()))
+        Draw.rectangle(c, (0, 0), paper.width, paper.height, FillStyle(self.colour.faded()))
         Draw.rectangle(c, (3*mm, 0), 13*mm, paper.height, FillStyle(self.colour))
 
         font = Font.train_letter.made_to_fit(self.name, c, 12.5*mm)

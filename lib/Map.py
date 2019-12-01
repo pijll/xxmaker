@@ -20,7 +20,8 @@ row_letters = [char for char in ".ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
 class Map:
     margin = 10*mm
 
-    def __init__(self, orientation, background=None, background_scale=None, background_xy=None):
+    def __init__(self, orientation, background=None, background_scale=None, background_xy=None,
+                 coords_inverted=False):
         self.orientation = orientation
         self.hexags = dict()
         self.game = None
@@ -28,11 +29,12 @@ class Map:
         self.background = background
         self.background_scale = background_scale
         self.background_xy = background_xy
+        self.coords_inverted = coords_inverted
 
     def add_hexag(self, coords=None, row=None, column=None, hexag=None):
         hexag = hexag or Hexag.empty()
         if coords:
-            row, column = coords_to_rowcolumn(coords)
+            row, column = self.coords_to_rowcolumn(coords)
         self.hexags[row, column] = hexag
         hexag.map = self
         hexag.orientation = self.orientation
@@ -73,7 +75,7 @@ class Map:
             if private.location_on_map is None:
                 continue
             if isinstance(private.location_on_map, str):
-                row, column = coords_to_rowcolumn(private.location_on_map)
+                row, column = self.coords_to_rowcolumn(private.location_on_map)
                 x, y = self.position_of_hexag(row, column)
                 Draw.circle(c, (x - 3*mm, y), 1*mm, LineStyle(Colour.black, 1))
                 Draw.circle(c, (x + 3*mm, y), 1*mm, LineStyle(Colour.black, 1))
@@ -120,8 +122,11 @@ class Map:
     def add_element(self, element, location='top left'):
         self.elements.append((element, location))
 
+    def coords_to_rowcolumn(self, coords):
+        row = row_letters.index(coords[0])
+        column = int(coords[1:])
 
-def coords_to_rowcolumn(coords):
-    row = row_letters.index(coords[0])
-    column = int(coords[1:])
-    return row, column
+        if self.coords_inverted:
+            return column, row
+        else:
+            return row, column
