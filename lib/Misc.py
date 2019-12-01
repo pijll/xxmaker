@@ -100,17 +100,13 @@ class RoundIndicator:
 
 
 def round_indicator_token():
-    return OutputFunctions.put_image_on_token('../../../graphics/misc/WingedWheel.png', logo_radius)
+    return OutputFunctions.put_image_on_token('misc/WingedWheel.png', logo_radius)
 
 
 def priority_deal():
     pd = Paper.Paper()
 
-    # pd.context.set_source_rgb(0, 0, 0)
-    # pd.context.move_to(10*mm, 15*mm)
-    # pd.context.show_text("Priority Deal")
-
-    Draw.load_image(pd.canvas, '../../../graphics/misc/Elephant.png', (pd.width/2, pd.height/2),
+    Draw.load_image(pd.canvas, 'misc/Elephant.png', (pd.width/2, pd.height/2),
                       pd.width-6*mm, pd.height-6*mm)
 
     return pd

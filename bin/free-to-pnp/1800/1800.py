@@ -1,19 +1,8 @@
-
-# License:
-# I give permission for anyone to design and post components for 1800 on boardgamegeek.
-# I am very pleased with what has been done so far. I also give permission for anyone to
-# download my files and make games for themselves. If someone wishes to produce some sets
-# and distribute them, it is OK with me provided that the total price is for materials
-# and postage only- no profit or "handling". I hope that players will use 1800 as an
-# introduction to the great 18xx series of games. Antonio Leal
-# https://boardgamegeek.com/thread/1785984/permission-granted
-
-
 import Game
 import Company
 import Output
 import Train
-import Paper
+import Misc
 import Colour
 import Private
 import Tile
@@ -23,21 +12,23 @@ from Hexag import Hill, Water, Hexag as Hex
 from City import City, Town, DoubleCity
 import Stockmarket
 from Definitions import *
+import os
 
 
-game = Game.Game(name="1800", author='Antonio Leal', currency='$')
+license_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'LICENSE.txt')
+game = Game.Game(name="1800", author='Antonio Leal', license_file=license_file, currency='$')
 
 cs = Company.Company(name="Colorado and Southern", abbreviation="CS",
-                     colour=(0, 1, 0), logo='free/Colorado_and_Southern.png',
+                     colour=Colour.green, logo='free/Colorado_and_Southern.png',
                      n_stations=3)
 dr = Company.Company(name="Denver and Rio Grande Western", abbreviation="DR",
-                     colour=(1, 0, 0), logo='free/Denver_Rio_Grande.png',
+                     colour=Colour.red, logo='free/Denver_Rio_Grande.png',
                      n_stations=3)
 
 # The Colorado & Western does not seem to be a historical company.
 # I've replaced it with the Colorado Midland, based in Colorado Springs
 cm = Company.Company(name="Colorado Midland", abbreviation="CM",
-                     colour=(0, 0, 1), logo='free/Colorado_Midland.png',
+                     colour=Colour.blue, logo='free/Colorado_Midland.png',
                      n_stations=3)
 
 game.add_company(cs)
@@ -64,6 +55,9 @@ map2.add_hexag(coords="G3", hexag=Hex(City(name='Denver'), cost=Water('$40')))
 map2.add_hexag(coords="G5", hexag=Hexag.External(links={N}, values=[10, 20, 30]))
 map2.add_hexag(coords='I3', hexag=Hexag.External(links={N}, values=[20, 30, 40]))
 
+map2.add_element(Misc.RoundIndicator(Colour.phase_1, Colour.phase_2, Colour.phase_3), 'top right')
+map2.add_element(Misc.Name(game), 'top left')
+game.add_token(Misc.round_indicator_token())
 
 map3 = Map.Map(orientation=VERTICAL)
 game.add_map(map3)
@@ -83,6 +77,9 @@ map3.add_hexag(coords="G5", hexag=Hexag.External(links={N}, values=[10, 20, 30])
 map3.add_hexag(coords="H2", hexag=Hexag.External(links={SE}, values=[10, 20, 30]))
 map3.add_hexag(coords="H4", hexag=Hexag.External(links={SW}, values=[10, 20, 30]))
 map3.add_hexag(coords="I3", hexag=Hexag.Hexag(City(name='Colorado Springs', companies=[cm])))
+
+map2.add_element(Misc.RoundIndicator(Colour.phase_1, Colour.phase_2, Colour.phase_3), 'top right')
+map3.add_element(Misc.Name(game), 'top left')
 
 stockmarket = [
     [80, 90, 100, 110, 120, 140, 160, 180, 200, 225],
@@ -123,6 +120,9 @@ game.add_private(Private.Private("C & S Bond", "$300", "$50"))
 game.add_private(Private.Private("Midland Terminal", "$25", "$5"))
 game.add_private(Private.Private("Denver and Salt Lake", "$70", "$10"))
 game.add_private(Private.Private("C & W Bond", "$300", "$50"))
+
+game.add_paper(Misc.priority_deal())
+#game.add_paper(Misc.trainyard())
 
 Tile.Tile(800, Colour.phase_2, Town('A', value=30), Hexag.Connect(SW, NE), Hexag.Connect(S, 'A'),
                         Hexag.Connect(SE, 'A'), label='D&SL', label_location=(-0.3, -0.5))
