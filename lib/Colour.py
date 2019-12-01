@@ -14,6 +14,16 @@ class Colour:
     def use_in_context(self, context):
         context.set_source_rgb(*self.rgb)
 
+    @property
+    def contrast_colour(self):
+        if self.brightness() > 0.5:
+            return black
+        else:
+            return white
+
+    # TODO
+    def faded(self, factor=0.1):
+        return Colour(r=self.r*factor + 1-factor, g=self.g*factor + 1-factor, b=self.b*factor + 1-factor)
 
 def set_palette(palette):
     for name, rgb in palette.items():

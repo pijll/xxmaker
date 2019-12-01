@@ -7,6 +7,9 @@ import Hexag
 from Hexag import Connect, WhiteTrack, DottedTrack
 import OutputFunctions
 import Font
+import Draw
+from Draw import LineStyle, FillStyle, TextStyle
+
 
 # Distance from flat side to flat side
 tile_size = 38*mm
@@ -21,9 +24,7 @@ class Tile:
         self.args = args
 
         self.hexag = Hexag.Hexag(*args, colour=colour, size=tile_size, outline=False, orientation=VERTICAL, **kwargs)
-
-        self.surface = None
-        self.context = None
+        self.canvas = None
 
         Tile.all[number] = self
 
@@ -40,19 +41,15 @@ class Tile:
         return tile_size
 
     def draw(self):
-        if self.surface:
-            return self.surface
+        if self.canvas:
+            return self.canvas
 
-        self.surface = self.hexag.draw()
-        self.context = self.hexag.context
+        self.canvas = self.hexag.draw()
 
-        self.context.set_source_rgb(*Colour.black.rgb)
-        self.context.move_to(0.25 * self.hexag.side_length, 0.8 * self.hexag.side_length)
-        OutputFunctions.draw_text(self.number, Font.very_small, self.context,
-                                  x=self.hexag.unit_length / (3**.5), y=self.hexag.unit_length,
-                                  valign='bottom', halign='right')
+        Draw.text(self.canvas, (self.hexag.unit_length / (3**.5), self.hexag.unit_length), self.number,
+                  TextStyle(Font.very_small, Colour.black, 'bottom', 'right'))
 
-        return self.surface
+        return self.canvas
 
 
 SE, S, SW, NW, N, NE = Hexag.tile_sides(Hexag.VERTICAL)

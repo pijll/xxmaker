@@ -21,7 +21,8 @@ class Font:
         else:
             return Pango.FontDescription(f"{self.family} {self.style} {self.size}")
 
-    def made_to_fit(self, txt, context, width):
+    def made_to_fit(self, txt, canvas, width):
+        context = canvas.context
         layout = PangoCairo.create_layout(context)
         layout.set_font_description(self.description)
         layout.set_text(str(txt))
@@ -48,6 +49,7 @@ small = Font(size=6)
 
 city_names = Font(size=8, style='Italic')
 city_value = Font(size=7)
+label = Font(size=10, style='Bold')
 
 certificate_name = Font(size=8, style='Bold')
 normal = Font(size=7)

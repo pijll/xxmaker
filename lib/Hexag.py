@@ -9,7 +9,7 @@ import City
 import Company
 import Font
 import Draw
-from Draw import LineStyle, FillStyle
+from Draw import LineStyle, FillStyle, TextStyle
 
 
 hexag_size = 40 * mm  # edge to edge
@@ -19,8 +19,7 @@ class Hexag:
     def __init__(self, *args, colour=None, size=None, outline=True, label=None, label_location=None,
                  orientation=None, cost=None, no_border=None, row=None, column=None):
         self.size = size or hexag_size
-        self.surface = None
-        self.context = None
+        self.canvas = None
         self.colour = colour or Colour.background
         self.outline = outline
         self.label = label
@@ -85,14 +84,11 @@ class Hexag:
         return [Vertex(angle=start_angle + x * pi/3) for x in range(6)]
 
     def draw(self):
-        if self.surface:
-            return self.surface
+        if self.canvas:
+            return self.canvas
 
-        self.surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(-self.width, -self.height,
-                                                                                         2 * self.width,
-                                                                                         2 * self.height))
-        self.context = cairo.Context(self.surface)
-        c = self.context
+        self.canvas = Draw.Canvas((-self.width, -self.height), 2 * self.width, 2 * self.height)
+        c = self.canvas
 
         h = self.unit_length
         s = self.side_length
@@ -103,8 +99,6 @@ class Hexag:
         city = dict()
         for ct in self.revenuelocations:
             city[ct.id] = ct
-
-        self.context.set_source_rgb(*Colour.black.rgb)
 
         connections_to_draw = []
         connections_to_draw += [(conn, Colour.white, 4 * mm, False) for conn in self.connections if not conn.over]
@@ -140,8 +134,6 @@ class Hexag:
                     if isinstance(arg, City.Town) or isinstance(arg, City.City):
                         towns.append(arg)
 
-            #arc(self, p, q, towns)
-
             if colour == Colour.black and conn.trackstyle == WhiteTrack:
                 draw_arc(self, p, q, towns, LineStyle(colour, linewidth), LineStyle(Colour.white, linewidth-1*mm))
             elif colour == Colour.black and conn.trackstyle == DottedTrack:
@@ -168,8 +160,7 @@ class Hexag:
             else:
                 # x, y = (0.7, 0.05)
                 x, y = (-0.5, -0.75)
-            OutputFunctions.draw_text_old(self.label, 'FreeSans Bold', 10, self.context, x * h, y * h, valign='center',
-                                          halign='center')
+            Draw.text(self.canvas, (x*h, y*h), self.label, TextStyle(Font.label, Colour.black, 'center', 'center'))
 
         if self.outline:
             hex_edges = list(tile_sides(self.orientation))
@@ -177,12 +168,13 @@ class Hexag:
                 if hex_edge not in self.no_border:
                     xy_start = hex_edge.left_vertex.xy(unit_length=self.unit_length)
                     xy_end = hex_edge.right_vertex.xy(unit_length=self.unit_length)
-                    Draw.line(self.context, xy_start, xy_end, LineStyle(Colour.black, 1))
+                    Draw.line(self.canvas, xy_start, xy_end, LineStyle(Colour.black, 1))
 
-        return self.surface
+        return self.canvas
+
 
 def draw_arc(hexag, p, q, towns, *styles):
-    context = hexag.context
+    canvas = hexag.canvas
     h = hexag.unit_length
     # Create a circular arc from point P on a side of the hex to point q somehere in the hex,
     # perpendicular to the hexside at P.
@@ -216,13 +208,13 @@ def draw_arc(hexag, p, q, towns, *styles):
                 if isinstance(town, City.Town):
                     town.angle = angle_of_pq_wrt_x_axis + pi / 2
             else:
-                Draw.line(context, ((x_town + town.length_bar / 2 * math.sin(angle_of_pq_wrt_x_axis)) * h,
+                Draw.line(canvas, ((x_town + town.length_bar / 2 * math.sin(angle_of_pq_wrt_x_axis)) * h,
                                     (y_town - town.length_bar / 2 * math.cos(angle_of_pq_wrt_x_axis)) * h),
                                    ((x_town - town.length_bar / 2 * math.sin(angle_of_pq_wrt_x_axis)) * h,
                                     (y_town + town.length_bar / 2 * math.cos(angle_of_pq_wrt_x_axis)) * h),
                           LineStyle(Colour.black, 3*mm))
 
-        Draw.line(context, (p.x*h, p.y*h), (q.x*h, q.y*h), *styles)
+        Draw.line(canvas, (p.x*h, p.y*h), (q.x*h, q.y*h), *styles)
     else:
         radius_of_circle = pq / (2 * abs(math.sin(angle_of_pq_wrt_x_axis - angle_origin_to_p_wrt_xaxis)))
         # print(f"radius = {radius_of_circle}")
@@ -245,7 +237,7 @@ def draw_arc(hexag, p, q, towns, *styles):
                 if isinstance(town, City.Town):
                     town.angle = angle_town
 
-        Draw.arc(context, (centre[0]*h, centre[1]*h), radius_of_circle*h, alpha, beta, *styles)
+        Draw.arc(canvas, (centre[0]*h, centre[1]*h), radius_of_circle*h, alpha, beta, *styles)
 
 
 def normalise_arc_angles(alpha, beta):
@@ -277,7 +269,7 @@ class External(Hexag):
 
     def draw(self):
         super().draw()
-        c = self.context
+        c = self.canvas
 
         h = self.unit_length
         s = self.side_length
@@ -288,7 +280,7 @@ class External(Hexag):
             right_side = ((direction.x + math.sin(direction.angle) * self.arrow_width) * h,
                           (direction.y - math.cos(direction.angle) * self.arrow_width) * h)
 
-            Draw.polygon(self.context, [left_side, tip_of_arrow, right_side], FillStyle(Colour.black))
+            Draw.polygon(self.canvas, [left_side, tip_of_arrow, right_side], FillStyle(Colour.black))
 
         if self.name:
             if self.name_location:
@@ -297,8 +289,7 @@ class External(Hexag):
                 x, y = 0, -.4
             else:
                 x, y = 0, 0
-            OutputFunctions.draw_text(self.name, Font.city_names, c, x*h, y*h, 'center', 'center')
-            c.stroke()
+            Draw.text(c, (x*h, y*h), self.name, TextStyle(Font.city_names, Colour.black, 'center', 'center'))
 
         if self.values:
             if self.value_location:
@@ -312,10 +303,10 @@ class External(Hexag):
                 x = (i - len(self.values) / 2) * box_size + x_c * self.unit_length
                 y = y_c * self.unit_length - box_size / 2
                 Draw.rectangle(c, (x, y), box_size, box_size, FillStyle(Colour.white), LineStyle(Colour.black, 1))
-                OutputFunctions.draw_text_old(str(v), 'FreeSans', 8, c, x + box_size / 2, y_c * self.unit_length, 'center', 'center')
-                c.stroke()
+                Draw.text(c, (x + box_size / 2, y_c * self.unit_length), v,
+                          TextStyle(Font.normal, Colour.black, 'center', 'center'))
 
-        return self.surface
+        return self.canvas
 
 
 class LocationOnHexag:
@@ -400,31 +391,24 @@ class Cost:
         self.x = x
         self.y = y
 
-    def draw(self, context, x, y):
+    def draw(self, canvas, x, y):
         pass
 
 
 class Hill(Cost):
-    def draw(self, context, x, y):
+    def draw(self, canvas, x, y):
         if self.x is not None:
             x = self.x * 20*mm      # TODO: unit_length
         if self.y is not None:
             y = self.y * 20*mm
-        Draw.triangle(context, (x, y), 10*mm, FillStyle(Colour.brown), LineStyle(Colour.black, 1))
-
-        OutputFunctions.draw_text(self.cost, Font.normal, context, x, y+2.5*mm, 'bottom', 'center')
+        Draw.triangle(canvas, (x, y), 10*mm, FillStyle(Colour.brown), LineStyle(Colour.black, 1))
+        Draw.text(canvas, (x, y+2.5*mm), self.cost, TextStyle(Font.normal, Colour.black, 'bottom', 'center'))
 
 
 class Water(Cost):
-    def draw(self, context, x, y):
-        context.move_to(x - 6 * mm, y + 0.5 * mm)
-        context.line_to(x, y - 10 * mm)
-        context.line_to(x + 6 * mm, y + 0.5 * mm)
-        context.close_path()
-
-        Draw.triangle(context, (x, y), 10.5*mm, FillStyle(Colour.lightblue), LineStyle(Colour.black, 1))
-
-        OutputFunctions.draw_text_old(str(self.cost), 'FreeSans', 8, context, x, y, 'bottom', 'center')
+    def draw(self, canvas, x, y):
+        Draw.triangle(canvas, (x, y), 10.5*mm, FillStyle(Colour.lightblue), LineStyle(Colour.black, 1))
+        Draw.text(canvas, (x, y + 2.5 * mm), self.cost, TextStyle(Font.normal, Colour.black, 'bottom', 'center'))
 
 
 class TrackStyle:
@@ -442,14 +426,14 @@ class Border:
         self.colour = colour
         self.hexag = None
 
-    def draw(self, context):
+    def draw(self, canvas):
         x, y = self.hexag.location_on_map()
         u = self.hexag.unit_length
 
         dx1, dy1 = self.hex_edge.left_vertex.xy(unit_length=u)
         dx2, dy2 = self.hex_edge.right_vertex.xy(unit_length=u)
 
-        Draw.line(context, (x+dx1, y+dy1), (x+dx2, y+dy2), LineStyle(self.colour or Colour.black,
+        Draw.line(canvas, (x+dx1, y+dy1), (x+dx2, y+dy2), LineStyle(self.colour or Colour.black,
                                                                      2*mm, end_cap = Draw.end_cap_round))
 
 

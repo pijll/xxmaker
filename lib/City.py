@@ -6,7 +6,7 @@ import math
 import Company
 import Font
 import Draw
-from Draw import LineStyle, FillStyle
+from Draw import LineStyle, FillStyle, TextStyle
 
 
 class RevenueLocation:
@@ -31,16 +31,12 @@ class RevenueLocation:
             self.value_location = self.default_value_location
         x = (self.x + self.value_location[0]) * hexag.unit_length
         y = (self.y + self.value_location[1]) * hexag.unit_length
-        c = hexag.context
-        Colour.black.use_in_context(c)
-        OutputFunctions.draw_text(self.value, Font.city_value, c, x, y, 'exactcenter', 'exactcenter')
-
+        c = hexag.canvas
+        Draw.text(c, (x,y), self.value, TextStyle(Font.city_value, Colour.black, 'exactcenter', 'exactcenter'))
         Draw.circle(c, (x,y), 3*mm, LineStyle(Colour.black, 1))
 
     def draw_name(self, hexag):
         if self.name:
-            c = hexag.context
-            Colour.black.use_in_context(c)
             if self.name_location is None:
                 if self.x > 0.4:
                     self.name_location = (-.4, 0, 'center', 'right')
@@ -52,11 +48,10 @@ class RevenueLocation:
                     self.name_location = (0, -self.name_distance, 'bottom', 'center')
             if len(self.name_location) < 4:
                 self.name_location += ('center', 'center')
-            OutputFunctions.draw_text(self.name, Font.city_names, c,
-                                          (self.x+self.name_location[0]) * hexag.unit_length,
-                                          (self.y + self.name_location[1]) * hexag.unit_length,
-                                          valign=self.name_location[2], halign=self.name_location[3])
-            c.stroke()
+            Draw.text(hexag.canvas, ((self.x+self.name_location[0]) * hexag.unit_length,
+                                     (self.y+self.name_location[1]) * hexag.unit_length),
+                      self.name, TextStyle(Font.city_names, Colour.black,
+                                           valign=self.name_location[2], halign=self.name_location[3]))
 
 
 class City(RevenueLocation):
@@ -71,37 +66,37 @@ class City(RevenueLocation):
     city_radius = Company.logo_radius * 1.1
 
     def draw(self, hexag):
-        context = hexag.context
-        City._draw_circle(context, self.x*hexag.unit_length, self.y*hexag.unit_length)
+        canvas = hexag.canvas
+        City._draw_circle(canvas, self.x * hexag.unit_length, self.y * hexag.unit_length)
 
         for c in self.companies:
-            c.paint_logo(context, self.x*hexag.unit_length, self.y*hexag.unit_length)
+            c.paint_logo(canvas, self.x * hexag.unit_length, self.y * hexag.unit_length)
 
     @classmethod
-    def _draw_circle(cls, context, x, y):
+    def _draw_circle(cls, canvas, x, y):
         radius = cls.city_radius
 
-        Draw.circle(context, (x, y), radius, FillStyle(Colour.white), LineStyle(Colour.black, cls.border_width))
+        Draw.circle(canvas, (x, y), radius, FillStyle(Colour.white), LineStyle(Colour.black, cls.border_width))
 
 
 class DoubleCity(City):
     default_value_location = (0.4, -0.7)
 
     def draw(self, hexag):
-        context = hexag.context
+        canvas = hexag.canvas
         city_radius = self.city_radius
 
-        Draw.rectangle(context, (self.x*hexag.unit_length - city_radius, self.y*hexag.unit_length - city_radius),
+        Draw.rectangle(canvas, (self.x*hexag.unit_length - city_radius, self.y*hexag.unit_length - city_radius),
                        2*city_radius, 2*city_radius, FillStyle(Colour.white), LineStyle(Colour.black, self.border_width))
 
         for i in (0, 1):
             x = self.x*hexag.unit_length + (2*i - 1)*city_radius
             y = self.y*hexag.unit_length
-            City._draw_circle(context, x, y)
+            City._draw_circle(canvas, x, y)
 
             if len(self.companies) > i:
                 company = self.companies[i]
-                company.paint_logo(context, x, y)
+                company.paint_logo(canvas, x, y)
 
 
 class TripleCity(City):
@@ -180,7 +175,7 @@ class Town(RevenueLocation):
         self.angle = None
 
     def draw(self, hexag):
-        c = hexag.context
+        c = hexag.canvas
         if self.angle is None:
             Draw.circle(c, (self.x*hexag.unit_length, self.y*hexag.unit_length),
                         self.radius*hexag.unit_length + 0.5*mm, FillStyle(Colour.black), LineStyle(Colour.white, 0.5*mm))
@@ -198,5 +193,5 @@ class Town(RevenueLocation):
 class Port(City):
     def draw(self, hexag):
         pass
-        # context = hexag.context
-        # OutputFunctions.load_image('../../../graphics/misc/Anchor1.png', context, 0, 0, 12*mm, 12*mm)
+        # canvas = hexag.canvas
+        # Draw.load_image(canvas, '../../../graphics/misc/Anchor1.png', (0, 0), 12*mm, 12*mm)
