@@ -1,11 +1,65 @@
 import cairo
 from gi.repository import Pango, PangoCairo
 from Definitions import *
-from math import ceil
-import Paper
+import subprocess
+import Colour
 
 
 end_cap_round = object()
+
+
+class Canvas:
+    def __init__(self, corner, width, height, surface=None, context=None):
+        """Create a new drawing surface.
+
+        corner: the coordinates of the top left corner of the canvas."""
+        self.corner = corner
+        self.width = width
+        self.height = height
+
+        self.surface = surface or cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(*corner, width, height))
+        self.context = context or cairo.Context(self.surface)
+
+    def draw(self, canvas, location, black_and_white=False, alpha=None, rotated=False):
+        """Paint one canvas on the other, at location x,y = location."""
+        if rotated:
+            source_canvas = Canvas((0, 0), canvas.height, canvas.width)
+            source_canvas.context.translate(canvas.height, 0)
+            source_canvas.context.rotate(3.14159 / 2)
+            source_canvas.context.set_source_surface(canvas.surface)
+            source_canvas.context.paint()
+        else:
+            source_canvas = canvas
+
+        self.context.set_source_surface(source_canvas.surface, *location)
+        if alpha is None:
+            self.context.paint()
+        else:
+            self.context.paint_with_alpha(alpha)
+
+        if black_and_white:
+            self.context.set_source_rgba(1, 1, 1)
+            self.context.set_operator(cairo.OPERATOR_HSL_COLOR)
+            self.context.rectangle(*location, source_canvas.width, source_canvas.height)
+            self.context.fill()
+
+
+class Page(Canvas):
+    def __init__(self, document):
+        super().__init__((0, 0), document.width, document.height, document.surface, document.context)
+
+    def add_register_marks(self, paper_width, paper_height, margin):
+        x = margin
+        while x <= self.width - margin:
+            line(self, (x, 0), (x, margin - 2 * mm), LineStyle(Colour.black, 1))
+            line(self, (x, self.height), (x, self.height - margin + 2 * mm), LineStyle(Colour.black, 1))
+            x += paper_width
+
+        y = margin
+        while y <= self.height - margin:
+            line(self, (0, y), (margin - 2 * mm, y), LineStyle(Colour.black, 1))
+            line(self, (self.width, y), (self.width - margin + 2 * mm, y), LineStyle(Colour.black, 1))
+            y += paper_height
 
 
 class Document:
@@ -23,30 +77,7 @@ class Document:
         if self.number_of_pages > 0:
             self.context.show_page()
         self.number_of_pages += 1
-
-    def split_into_parts(self, paper):
-        def how_many_fit(large, small):
-            return ceil(large/(small-2*self.margin))
-
-        n_portrait_pages = how_many_fit(paper.width, self.width) * how_many_fit(paper.height, self.height)
-        n_landscape_pages = how_many_fit(paper.width, self.height) * how_many_fit(paper.height, self.width)
-
-        if n_landscape_pages < n_portrait_pages:
-            split_in_parts_horizontally = how_many_fit(paper.width, self.height)
-            split_in_parts_vertically = how_many_fit(paper.height, self.width)
-        else:
-            split_in_parts_horizontally = how_many_fit(paper.width, self.width)
-            split_in_parts_vertically = how_many_fit(paper.height, self.height)
-
-        width_map_part = paper.width/split_in_parts_horizontally
-        height_map_part = paper.height/split_in_parts_vertically
-
-        for column in range(split_in_parts_horizontally):
-            for row in range(split_in_parts_vertically):
-                paper_part = Paper.Paper(width_map_part, height_map_part)
-
-                paper_part.canvas.draw(paper.canvas, (-column*width_map_part, -row*height_map_part))
-                yield paper_part
+        return Page(self)
 
     def add_papers(self, paper_list):
         """Add papers to the document.
@@ -61,70 +92,26 @@ class Document:
         capacity_landscape = how_many_fit_on_page(self.height, w) * how_many_fit_on_page(self.width, h)
 
         papers_are_rotated = (capacity_landscape > capacity_portrait)
-        if papers_are_rotated:
-            # self.context.save()
-            # self.context.transform(cairo.Matrix(0, -1, 1, 0, 0, self.height))
-            w, h = h, w
 
+        if papers_are_rotated:
+            w, h = h, w
         n_papers_per_row = how_many_fit_on_page(self.width, w)
         n_papers_per_column = how_many_fit_on_page(self.height, h)
 
+        page = None
         for i, paper in enumerate( paper_list):
             column = i % n_papers_per_row
             row = (i//n_papers_per_row) % n_papers_per_column
 
             if row == 0 and column == 0:
-                self.new_page()
+                page = self.new_page()
+                page.add_register_marks(w, h, self.margin)
 
-            if papers_are_rotated:
-                source_canvas = Canvas((0,0), w, h)
-                # source_canvas.context.transform(cairo.Matrix(0, -1, 1, 0, 0, paper.height))
-                # source_canvas.context.save()
-                # paper.canvas.context.translate(h/2, w/2)
-                # paper.canvas.context.rotate(3.141/5)
+            page.draw(paper.canvas, (self.margin + column * w, self.margin + row * h), rotated=papers_are_rotated)
 
-                source_canvas.context.translate(w,0)
-                source_canvas.context.rotate(3.141/2)
-                source_canvas.context.set_source_surface(paper.canvas.surface)
-                source_canvas.context.paint()
-
-                # source_canvas.context.restore()
-                source_surface = source_canvas.surface
-            else:
-                source_surface = paper.canvas.surface
-
-            self.context.set_source_surface(source_surface, self.margin + column * w,
-                                            self.margin + row * h)
-            self.context.paint()
-
-
-class Canvas:
-    def __init__(self, corner, width, height):
-        """Create a new drawing surface.
-
-        corner: the coordinates of the top left corner of the canvas."""
-        self.corner = corner
-        self.width = width
-        self.height = height
-
-        self.surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(*corner, width, height))
-        self.context = cairo.Context(self.surface)
-
-        #self.font_map = PangoCairo.FontMap.get_default()
-
-    def draw(self, canvas, location, black_and_white=False, alpha=None):
-        """Paint one canvas on the other, at location x,y = location."""
-        self.context.set_source_surface(canvas.surface, *location)
-        if alpha is None:
-            self.context.paint()
-        else:
-            self.context.paint_with_alpha(alpha)
-
-        if black_and_white:
-            self.context.set_source_rgba(1, 1, 1)
-            self.context.set_operator(cairo.OPERATOR_HSL_COLOR)
-            self.context.rectangle(*location, canvas.width, canvas.height)
-            self.context.fill()
+    def finish(self):
+        self.surface.finish()
+        subprocess.run(['ps2pdf', 'out.ps'])
 
 
 class LineStyle:

@@ -1,19 +1,10 @@
-import cairo
 import Paper
 import collections
 import math
 from Definitions import *
-import subprocess
 import Draw
 import Colour
 from Draw import LineStyle, FillStyle, TextStyle
-
-
-A4_WIDTH_IN_MM = 210
-A4_HEIGHT_IN_MM = 297
-
-A4_WIDTH_IN_PT = int(A4_WIDTH_IN_MM / 25.4 * 72)
-A4_HEIGHT_IN_PT = int(A4_HEIGHT_IN_MM / 25.4 * 72)
 
 
 class PaperTooLargeException(BaseException):
@@ -83,19 +74,6 @@ class PageSet:
 
         # self.context.restore()
 
-    def add_register_marks(self):
-        x = self.margin
-        while x <= self.width - self.margin:
-            Draw.line(self.canvas, (x, 0), (x, self.margin-2*mm), LineStyle(Colour.black, 1))
-            Draw.line(self.canvas, (x, self.height), (x, self.height - self.margin + 2*mm), LineStyle(Colour.black, 1))
-            x += self.paper_width
-
-        y = self.margin
-        while y <= self.height - self.margin:
-            Draw.line(self.canvas, (0, y), (self.margin - 2*mm, y), LineStyle(Colour.black, 1))
-            Draw.line(self.canvas, (self.width, y), (self.width - self.margin + 2*mm, y), LineStyle(Colour.black, 1))
-            y += self.paper_height
-
     @classmethod
     def fits(cls, paper):
         if paper.width < cls.page_width-2*cls.margin and paper.height < cls.page_height-2*cls.margin:
@@ -123,13 +101,16 @@ class PageSet:
 
 
 class Output:
+    paper_width = A4_WIDTH
+    paper_height = A4_HEIGHT
+
     def __init__(self, game, margin=10*mm):
         self.game = game
         self.margin = margin
         self.document = None
 
     def generate(self):
-        self.document = Draw.Document("out.ps", A4_WIDTH_IN_PT, A4_HEIGHT_IN_PT, 10*mm)
+        self.document = Draw.Document("out.ps", self.paper_width, self.paper_height, 10*mm)
 
         papers = []
 
@@ -154,44 +135,44 @@ class Output:
 
         papers_by_dimension = collections.defaultdict(list)
         for paper in papers:
-            paper_parts = list(self.document.split_into_parts(paper))
+            paper_parts = list(paper.split_into_parts(self.document.width-2*self.margin,
+                                                      self.document.height-2*self.margin))
             papers_by_dimension[(paper_parts[0].width, paper_parts[0].height)] += paper_parts
 
-        for paper_list in papers_by_dimension.values():
+        for (paper_width, paper_height), paper_list in papers_by_dimension.items():
             self.document.add_papers(paper_list)
 
-        # current_x_left = self.margin
-        # current_y_top = self.margin
-        # current_line = 0
-        # for tile in self.game.tiles:
-        #     if current_x_left + tile.width >= A4_WIDTH_IN_PT - self.margin:
-        #         current_y_top += tile.height
-        #         current_line += 1
-        #         current_x_left = self.margin + tile.width * (current_line % 2) / 2
-        #         if current_y_top + tile.height >= A4_HEIGHT_IN_PT - self.margin:
-        #             self.context.show_page()
-        #             current_x_left = self.margin
-        #             current_y_top = self.margin
-        #             current_line = 0
-        #
-        #     self.context.set_source_surface(tile.draw(), current_x_left + tile.width/2, current_y_top+tile.height/2)
-        #     self.context.paint()
-        #     current_x_left += tile.width
-        #
-        # self.context.show_page()
+        page = self.document.new_page()
+        current_x_left = self.margin
+        current_y_top = self.margin
+        current_line = 0
+        for tile in self.game.tiles:
+            if current_x_left + tile.width >= self.document.width - self.margin:
+                current_y_top += tile.height
+                current_line += 1
+                current_x_left = self.margin + tile.width * (current_line % 2) / 2
+                if current_y_top + tile.height >= self.document.height - self.margin:
+                    page = self.document.new_page()
+                    current_x_left = self.margin
+                    current_y_top = self.margin
+                    current_line = 0
+
+            page.draw(tile.draw(), (current_x_left + tile.width/2, current_y_top+tile.height/2))
+            current_x_left += tile.width
+
+        page = self.document.new_page()
 
         # Tokens
-        # size = 2*logo_radius + 7*mm
-        # number_per_row = PageSet.page_width // size
-        #
-        # for i, token in enumerate(self.game.tokens):
-        #     x = self.margin + (i % number_per_row) * size
-        #     y = self.margin + (i // number_per_row) * size
-        #     self.context.set_source_surface(token, x, y)
-        #     self.context.paint()
+        size = 2*logo_radius + 7*mm
+        number_per_row = self.document.width // size
 
-        self.document.surface.finish()
-        subprocess.run(['ps2pdf', 'out.ps'])
+        for i, token in enumerate(self.game.tokens):
+            x = self.margin + (i % number_per_row) * size
+            y = self.margin + (i // number_per_row) * size
+            page.draw(token, (x, y))
+
+        self.document.finish()
+
 
 
 #
