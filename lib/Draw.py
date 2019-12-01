@@ -120,7 +120,7 @@ class Document:
 
     def finish(self):
         self.surface.finish()
-        subprocess.run(['ps2pdf', 'out.ps'])
+        subprocess.run(['ps2pdf', self.filename])
 
 
 class LineStyle:
