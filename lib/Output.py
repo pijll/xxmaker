@@ -12,14 +12,15 @@ class Output:
     paper_width = A4_WIDTH
     paper_height = A4_HEIGHT
 
-    def __init__(self, game, margin=10*mm, filename='out'):
+    def __init__(self, game, margin=10*mm, output_file='out'):
         self.game = game
         self.margin = margin
+        self.output_file = output_file
         self.document = None
         self.filename = filename
 
     def generate(self):
-        self.document = Draw.Document(self.filename + '.ps', self.paper_width, self.paper_height, 10*mm)
+        self.document = Draw.Document(self.output_file + '.ps', self.paper_width, self.paper_height, 10*mm)
 
         papers = []
 
