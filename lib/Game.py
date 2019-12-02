@@ -42,6 +42,7 @@ class Game:
 
     def add_stockmarket(self, stockmarket):
         self.stockmarket = stockmarket
+        stockmarket.game = self
 
     def add_paper(self, paper):
         self.papers.append(paper)

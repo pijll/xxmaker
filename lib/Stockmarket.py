@@ -12,11 +12,12 @@ class Stockmarket:
 
     def __init__(self, cells, has_par_box=False):
         self.has_par_box = has_par_box
+        self.game = None
 
         self.cells = dict()
         for i, row in enumerate(cells):
             for j, val in enumerate(row):
-                self.cells[i, j] = Cell(row=i, column=j, value=val)
+                self.cells[i, j] = Cell(row=i, column=j, value=val, stockmarket=self)
 
         for cell in self.cells.values():
             if (cell.row, cell.column-1) not in self.cells and \
@@ -54,10 +55,11 @@ class Cell:
     width = 15 * mm
     height = 16 * mm
 
-    def __init__(self, row, column, value, colour=None, down_arrow=None, up_arrow=None):
+    def __init__(self, row, column, value, stockmarket, colour=None, down_arrow=None, up_arrow=None):
         self.row = row
         self.column = column
         self.value = value
+        self.stockmarket = stockmarket
         self.colour = colour
         self.down_arrow = down_arrow
         self.up_arrow = up_arrow
@@ -96,12 +98,6 @@ class Cell:
                       [x, y-4.5*mm],
                       [x+1*mm, y-6*mm]]
             Draw.polygon(c, points, FillStyle(Colour.black))
-            # c.move_to(self.x + 2*mm, self.y + self.height - 1*mm)
-            # c.rel_line_to(-1*mm, -6*mm)
-            # c.rel_line_to(1*mm, 1.5*mm)
-            # c.rel_line_to(1*mm, -1.5*mm)
-            # c.close_path()
-            # c.fill()
         if self.up_arrow:
             x, y = self.x + self.width-2*mm, self.y+1*mm
             points = [[x, y],
@@ -109,9 +105,10 @@ class Cell:
                       [x, y+4.5*mm],
                       [x+1*mm, y+6*mm]]
             Draw.polygon(c, points, FillStyle(Colour.black))
-            # c.move_to(self.x + self.width - 2*mm, self.y + 1*mm)
-            # c.rel_line_to(-1*mm, 6*mm)
-            # c.rel_line_to(1*mm, -1.5*mm)
-            # c.rel_line_to(1*mm, 1.5*mm)
-            # c.close_path()
-            # c.fill()
+
+        companies = [company.abbreviation for company in self.stockmarket.game.companies.values()
+                     if company.par_price == self.value]
+        y = self.y + self.height-1*mm
+        for company in sorted(companies, reverse=True):
+            Draw.text(c, (self.x+self.width-1*mm, y), company, TextStyle(Font.very_small, Colour.black, 'bottom', 'right'))
+            y -= 3*mm

@@ -15,7 +15,8 @@ class Company:
     token_costs_default = ['', 40, 100]
     token_interspace = 4*mm
 
-    def __init__(self, name, abbreviation, colour, n_stations=0, num_shares=10, logo=None, token_costs=None):
+    def __init__(self, name, abbreviation, colour, n_stations=0, num_shares=10, logo=None, token_costs=None,
+                 par_price=None):
         self.name = name
         self.abbreviation = abbreviation
         self.colour = colour
@@ -27,6 +28,7 @@ class Company:
         else:
             self.logo = self._make_logo_from_abbrev(self.abbreviation, radius=logo_radius)
         self.game = None
+        self.par_price = par_price
 
     def charter(self):
         width = 130 * mm
@@ -77,8 +79,9 @@ class Company:
         Draw.rectangle(c, (0,0), share.width, share.height, FillStyle(self.colour.faded()))
         Draw.rectangle(c, (3*mm,0), 13*mm, share.height, FillStyle(self.colour))
 
+        y = share.height/2 if self.par_price else 14*mm
         OutputFunctions.draw_centered_lines(self.name, Font.certificate_name, c,
-                                                x_c=(share.width + 16*mm)/2, y=14 * mm,
+                                                x_c=(share.width + 16*mm)/2, y=y,
                                                 width=share.width - 16*mm - 6*mm)
 
         number_of_shares = 'Two shares' if director else 'One share'
@@ -86,6 +89,11 @@ class Company:
                   TextStyle(Font.normal, Colour.black, 'bottom', 'left'))
         Draw.text(c, (share.width-3*mm, share.height-3*mm), f'{percentage}%',
                   TextStyle(Font.normal, Colour.black, 'bottom', 'right'))
+
+        if self.par_price:
+            price = 2*self.par_price if director else self.par_price
+            Draw.text(c, (share.width - 3*mm, 2.8*mm), price,
+                      TextStyle(Font.price, Colour.black, 'top', 'right'))
 
         self.paint_logo(c, 9.5*mm, 11.5*mm)
         if director:

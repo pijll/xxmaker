@@ -24,55 +24,55 @@ def create_18Africa(outfile='18Africa'):
 
     ar = Company.Company(name="Alexandria Railway", abbreviation="A",
                          colour=Colour.red, # logo='free/xxx.png',
-                         n_stations=5)
+                         n_stations=5, par_price=100)
     aor = Company.Company(name="Algiers-Oran Railway", abbreviation="AO",
                           colour=Colour.green, # logo='free/xxx.png',
-                          n_stations=2)
+                          n_stations=2, par_price=90)
     cgh = Company.Company(name="Cape of Good Hope & Western Railway", abbreviation="CW",
                           colour=Colour.black, # logo='free/xxx.png',
-                          n_stations=3)
+                          n_stations=3, par_price=76)
     csa = Company.Company(name="Central South African Railway", abbreviation="CSA",
                           colour=Colour.yellow, # logo='free/xxx.png',
-                          n_stations=3)
+                          n_stations=3, par_price=100)
     cnr = Company.Company(name="Congolese National Railway", abbreviation="CN",
                           colour=Colour.green, # logo='free/xxx.png',
-                          n_stations=3)
+                          n_stations=3, par_price=61)
     cor = Company.Company(name="Congo-Oc\u00E9an Railway", abbreviation="CO",
                           colour=Colour.blue, # logo='free/xxx.png',
-                          n_stations=4)
+                          n_stations=4, par_price=82)
     ear = Company.Company(name="East African Railway", abbreviation="EA",
                           colour=Colour.brown, # logo='free/xxx.png',
-                          n_stations=3)
+                          n_stations=3, par_price=90)
     enr = Company.Company(name="Egyptian National Railway", abbreviation="EN",
                           colour=Colour.yellow, # logo='free/xxx.png',
-                          n_stations=4)
+                          n_stations=4, par_price=82)
     kr = Company.Company(name="Kenyan Railway", abbreviation="K",
                          colour=Colour.green, # logo='free/xxx.png',
-                         n_stations=3)
+                         n_stations=3, par_price=82)
     mfr = Company.Company(name="Marrakech-Fez Railway", abbreviation="MF",
                           colour=Colour.blue, # logo='free/xxx.png',
-                          n_stations=2)
+                          n_stations=2, par_price=76)
     mnr = Company.Company(name="Morrocan National Railway", abbreviation="MN",
                           colour=Colour.brown, # logo='free/xxx.png',
-                          n_stations=2)
+                          n_stations=2, par_price=76)
     nza = Company.Company(name="Nederlands Zuid African Railways", abbreviation="NZA",
                           colour=Colour.brown, # logo='free/xxx.png',
-                          n_stations=3)
+                          n_stations=3, par_price=71)
     nr = Company.Company(name="Nigerian Railway", abbreviation="N",
                           colour=Colour.brown, # logo='free/xxx.png',
-                          n_stations=2)
+                          n_stations=2, par_price=71)
     sr = Company.Company(name="Sudan Railway", abbreviation="S",
                           colour=Colour.blue, # logo='free/xxx.png',
-                          n_stations=3)
+                          n_stations=3, par_price=67)
     tch = Company.Company(name="Tangier Casablanca High Speed Line", abbreviation="TC",
                           colour=Colour.yellow, # logo='free/xxx.png',
-                          n_stations=2)
+                          n_stations=2, par_price=71)
     tor = Company.Company(name="Timbuktu-Oran Railway", abbreviation="TO",
                           colour=Colour.red, # logo='free/xxx.png',
-                          n_stations=3)
+                          n_stations=3, par_price=71)
     ur = Company.Company(name="Ugandan Railway", abbreviation="U",
                           colour=Colour.brown, # logo='free/xxx.png',
-                          n_stations=3)
+                          n_stations=3, par_price=64)
 
     game.add_company(ar, aor, cgh, csa, cnr, cor, ear, enr, kr, mfr, mnr, nza, nr, sr, tch, tor, ur)
 
