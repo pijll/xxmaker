@@ -1,6 +1,7 @@
 import Game
 import Company
 import Draw
+from Draw import LineStyle, FillStyle, TextStyle
 import Train
 import Misc
 import Colour
@@ -16,6 +17,7 @@ import os
 import Paper
 import Font
 import Output
+import OutputFunctions
 
 
 def create_18Africa(outfile='18Africa'):
@@ -276,6 +278,8 @@ def create_18Africa(outfile='18Africa'):
     map.add_element(Misc.Name(game), 'top right')
     game.add_token(Misc.round_indicator_token())
 
+    game.add_token(OutputFunctions.put_image_on_token('misc/weather/weather.svg', logo_radius))
+
     stockmarket = [[0,5,10,22,34,45,56,58,61,64,67,71,76,82,90,100,112,126,142,160,180,205,230,255,280,300,
                     320,340,360,380,400,420,440,460]]
 
@@ -305,7 +309,22 @@ def create_18Africa(outfile='18Africa'):
 
     government_bond = Paper.Paper()
     Draw.text(government_bond.canvas, (government_bond.width/2, 10*mm), 'Government Bond 100',
-              Draw.TextStyle(Font.certificate_name, Colour.black))
+              Draw.TextStyle(Font.certificate_name, Colour.black, 'center', 'center'))
+    Draw.rectangle(government_bond.canvas, (10*mm, 20*mm), 10*mm, 15*mm, LineStyle(Colour.black, 1))
+    Draw.text(government_bond.canvas, (15*mm, 35*mm), 10, TextStyle(Font.normal, Colour.black, 'bottom', 'center'))
+    Draw.load_image(government_bond.canvas, 'misc/weather/sunny.svg', (15*mm, 25*mm), 10*mm, 10*mm)
+    Draw.rectangle(government_bond.canvas, (20 * mm, 20 * mm), 10 * mm, 15 * mm, LineStyle(Colour.black, 1))
+    Draw.text(government_bond.canvas, (25*mm, 35*mm), 15, TextStyle(Font.normal, Colour.black, 'bottom', 'center'))
+    Draw.load_image(government_bond.canvas, 'misc/weather/halfcloud.svg', (25*mm, 25*mm), 10*mm, 10*mm)
+    Draw.rectangle(government_bond.canvas, (30 * mm, 20 * mm), 10 * mm, 15 * mm, LineStyle(Colour.black, 1))
+    Draw.text(government_bond.canvas, (35*mm, 35*mm), 30, TextStyle(Font.normal, Colour.black, 'bottom', 'center'))
+    Draw.load_image(government_bond.canvas, 'misc/weather/rain.svg', (35*mm, 25*mm), 10*mm, 10*mm)
+    Draw.rectangle(government_bond.canvas, (40 * mm, 20 * mm), 10 * mm, 15 * mm, LineStyle(Colour.black, 1))
+    Draw.text(government_bond.canvas, (45*mm, 35*mm), 40, TextStyle(Font.normal, Colour.black, 'bottom', 'center'))
+    Draw.load_image(government_bond.canvas, 'misc/weather/thunder.svg', (45*mm, 25*mm), 10*mm, 10*mm)
+
+    for i in range(20):
+        game.add_paper(government_bond)
 
     game.add_private(Private.Private("Cape Wine Co.", 25, 5))
     game.add_private(Private.Private("Allen Rock Aggregates", 35, 5, 'Build extra yellow tile',
