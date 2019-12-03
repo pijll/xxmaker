@@ -62,6 +62,8 @@ def create_18africa(outfile='18Africa'):
     gas = Contract('Natural Gas', origin='Kufra', destination='Tripoli',
                             value=50, icon='misc/carriages/tank.svg', colour=Colour.lightblue)
 
+    game.add_paper(minerals, copper, dates, gold, cotton, oil, gas)
+
     ar = Company.Company(name="Alexandria Railway", abbreviation="A",
                          colour=Colour.red, # logo='free/xxx.png',
                          n_stations=5, par_price=100)
@@ -371,19 +373,22 @@ def create_18africa(outfile='18Africa'):
     for i in range(20):
         game.add_paper(government_bond)
 
-    game.add_private(Private.Private("Cape Wine Co.", 25, 5))
+    game.add_private(Private.Private("Cape Wine Co.", 25, 5, image='misc/grapes.svg'))
     game.add_private(Private.Private("Allen Rock Aggregates", 35, 5, 'Build extra yellow tile',
+                                     image='misc/stone.svg'))
+    game.add_private(Private.Private("Thompson Wagon Works", 60, 10, 'Double upgrade in same hex',
                                      image=''))
-    game.add_private(Private.Private("Thompson Wagon Works", 60, 10, 'Double upgrade in same hex'))
-    game.add_private(Private.Private("Jamieson Tropical Timber", 75, 12, 'One free river crossing'))
-    game.add_private(Private.Private("George Edmunds Colonial Factors", 115, 20, 'One free station marker'))
-    game.add_private(Private.Private("Madianos Olive Groves", 160, 25, 'Owner may claim Priority Deal'))
+    game.add_private(Private.Private("Jamieson Tropical Timber", 75, 12, 'One free river crossing',
+                                     image='misc/bridge.svg'))
+    game.add_private(Private.Private("George Edmunds Colonial Factors", 115, 20, 'One free station marker',
+                                     image='misc/Station.png'))
+    game.add_private(Private.Private("Madianos Olive Groves", 160, 25, 'Owner may claim Priority Deal',
+                                     image='misc/Elephant.png'))
 
     # TODO: add contracts
 
     game.add_paper(Misc.priority_deal())
-    #game.add_paper(Misc.trainyard())
-
+    # game.add_paper(Misc.trainyard())
 
     Tile.Tile('Af10', Colour.phase_3, Town('A', value=20), Connect(N, S), Connect(NW, SE), Connect(SW, 'A'))
     Tile.Tile('Af20', Colour.phase_4, Connect(SW, SE, City(value=50, location=0.25), over=True),
