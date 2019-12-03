@@ -17,7 +17,6 @@ class Output:
         self.margin = margin
         self.output_file = output_file
         self.document = None
-        self.filename = filename
 
     def generate(self):
         self.document = Draw.Document(self.output_file + '.ps', self.paper_width, self.paper_height, 10*mm)

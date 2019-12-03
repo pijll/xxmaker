@@ -420,7 +420,7 @@ def create_18africa(outfile='18Africa'):
         else:
             print(f"OOPS tile {tile_number}")
 
-    out = Output.Output(game=game, filename=outfile)
+    out = Output.Output(game=game, output_file=outfile)
     out.generate()
 
 
