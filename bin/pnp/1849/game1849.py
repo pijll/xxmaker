@@ -256,5 +256,6 @@ def create_1849(output_file='1849'):
     out = Output.Output(game=game, output_file=output_file)
     out.generate()
 
+
 if __name__ == '__main__':
     create_1849('1849')

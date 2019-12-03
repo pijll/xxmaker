@@ -21,6 +21,23 @@ class AllGames(unittest.TestCase):
         # assert
         self.assertTrue(os.path.isfile('18Africa.pdf'))
 
+    def test_1800(self):
+        # arrange
+        sys.path.insert(1, '../bin/pnp/1800')
+        import game1800
+
+        try:
+            os.remove('1800.ps')
+            os.remove('1800.pdf')
+        except OSError:
+            pass
+
+        # act
+        game1800.create_1800()
+
+        # assert
+        self.assertTrue(os.path.isfile('1800.pdf'))
+
     def test_1849(self):
         # arrange
         sys.path.insert(1, '../bin/pnp/1849')
@@ -36,7 +53,8 @@ class AllGames(unittest.TestCase):
         game1849.create_1849()
 
         # assert
-        os.path.isfile('1849.pdf')
+        self.assertTrue(os.path.isfile('1849.pdf'))
+
 
 if __name__ == '__main__':
     unittest.main()
