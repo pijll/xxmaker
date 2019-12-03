@@ -1,3 +1,5 @@
+import tempfile
+
 import cairo
 from gi.repository import Pango, PangoCairo
 from Definitions import *
@@ -120,7 +122,7 @@ class Document:
 
     def finish(self):
         self.surface.finish()
-        subprocess.run(['ps2pdf', 'out.ps'])
+        subprocess.run(['ps2pdf', self.filename])
 
 
 class LineStyle:
@@ -260,11 +262,6 @@ def load_image(canvas, filename, center, width, height, circle_clip=False):
     """Filename should be relative to the graphics directory."""
     home_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     complete_filename = os.path.join(home_dir, 'graphics', filename)
-    try:
-        image = cairo.ImageSurface.create_from_png(complete_filename)
-    except cairo.Error:
-        print(f'{cairo.Error}, filename={filename}')
-        return False
 
     license_file = complete_filename + '.txt'
     try:
@@ -274,6 +271,14 @@ def load_image(canvas, filename, center, width, height, circle_clip=False):
         raise Exception(f"No license file found for file '{filename}'") from None
 
     canvas.license_info[filename] = license_txt
+
+    if complete_filename.endswith('.svg'):
+        complete_filename = convert_svg_to_png(complete_filename)
+    try:
+        image = cairo.ImageSurface.create_from_png(complete_filename)
+    except cairo.Error:
+        print(f'{cairo.Error}, filename={filename}')
+        return False
 
     img_width = image.get_width()
     img_height = image.get_height()
@@ -290,3 +295,12 @@ def load_image(canvas, filename, center, width, height, circle_clip=False):
     context.paint()
     context.restore()
     return True
+
+
+def convert_svg_to_png(complete_filename):
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.png')
+    filename_png = temp_file.name
+    temp_file.close()
+    # TODO: better transparency (this gives white outlines in an anti-aliased image)
+    subprocess.run(['convert', complete_filename, '-transparent', 'white', filename_png])
+    return filename_png

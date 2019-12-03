@@ -69,7 +69,7 @@ Tile(8, Colour.phase_1, Connect(S, NW))     # 1830
 Tile(9, Colour.phase_1, Connect(N, S))      # 1830
 Tile(10, Colour.phase_2, City("A", 30, -0.3, -0.6), City("B", 30, 0.3, 0.6), Connect(NW, "A"), Connect(SE, "B"))
 Tile(12, Colour.phase_2, City("A", 30), Connect(S, "A"), Connect(SE, "A"), Connect(NE, "A"))
-# Tile(13, Colour.phase_2, City("A", 30), Connect(N, "A"), Connect(SW, "A"), Connect(SE, "A"))
+Tile(13, Colour.phase_2, City("A", 30), Connect(S, "A"), Connect(NW, "A"), Connect(NE, "A"))
 Tile(14, Colour.phase_2, Connect(N, S, DoubleCity(value=30)), Connect(NE, SW))      # 1830
 Tile(15, Colour.phase_2, DoubleCity(id_="A", value=30), Connect(SW, "A"), Connect(NW, "A"),
      Connect(S, "A"), Connect(N, "A"))       # 1830
@@ -87,6 +87,13 @@ Tile(28, Colour.phase_2, Connect(S, NW), Connect(NW, SW))   # 1830
 Tile(29, Colour.phase_2, Connect(S, NW), Connect(S, SW))    # 1830
 Tile(30, Colour.phase_2, Connect(S, SE), Connect(SE, N))
 Tile(31, Colour.phase_2, Connect(SW, SE), Connect(SE, NE))
+Tile(35, Colour.phase_3, Connect(SW, SE, City(value=40, location=0.25), over=True),
+     Connect(S, NW, City(value=40, location=0.75), under=True))
+Tile(36, Colour.phase_3, Connect(S, NW, City(value=40, location=0.75, value_location=(0.45, 0.2))),
+     Connect(N, SE, City(value=40, location=0.75, value_location=(-0.45, -0.2))))
+Tile(37, Colour.phase_3, City('A', x=-0.5, y=-0.3), City('B', x=0.5, y=0.3),
+     Connect(S, N), Connect(S, 'A'), Connect(N, 'B'))
+Tile(38, Colour.phase_3, Connect(N, S, DoubleCity(id_="A", value=40)), Connect(SW, "A"), Connect(NW, "A"))
 Tile(39, Colour.phase_3, Connect(S, NW), Connect(S, SW), Connect(NW, SW))   # 1830
 Tile(40, Colour.phase_3, Connect(S, NW), Connect(S, NE), Connect(NW, NE))   # 1830
 Tile(41, Colour.phase_3, Connect(S, N), Connect(S, SW), Connect(SW, N))     # 1830
@@ -98,13 +105,14 @@ Tile(45, Colour.phase_3, Connect(S, N, under=True), Connect(S, SE), Connect(N, S
 Tile(46, Colour.phase_3, Connect(S, N, under=True), Connect(S, NW), Connect(N, NE), Connect(NW, NE, over=True))     # 1830
 Tile(47, Colour.phase_3, Connect(S, N, under=True), Connect(SW, NE, over=True),
      Connect(S, NE), Connect(N, SW))     # 1830
+Tile(51, Colour.phase_4, Connect(N, S, DoubleCity('A', value=50)), Connect(NW, SE), Connect('A', SW))
 Tile(53, Colour.phase_2, City(id_='A', value=50, value_location=(0, -.65)), Connect(S, 'A'),
      Connect(NW, 'A'), Connect(NE, 'A'), label='B')   # 1830
 Tile(54, Colour.phase_2, Connect(N, NW, City(value=60)), Connect(S, SW, City(value=60)), label='NY')
 Tile(55, Colour.phase_1, Connect(NW, SE, Town(value=10, location=0.25), over=True),
      Connect(S, N, Town(value=10, location=0.75), under=True))   # 1830
 Tile(56, Colour.phase_1, Connect(SW, SE, Town(value=10, location=0.75), over=True),
-     Connect(S, NE, Town(value=10, location=0.25)))      # 1830
+     Connect(S, NE, Town(value=10, location=0.25), under=True))      # 1830
 Tile(57, Colour.phase_1, Connect(N, S, City(value=20)))     # 1830
 Tile(58, Colour.phase_1, Connect(S, NW, Town(value=10)))    # 1830
 Tile(59, Colour.phase_2, City(id_='A', value=40, x=-0.3, y=0.5), City(id_='B', value=40, x=0.3, y=-0.5, value_location=(-0.7,0)),
@@ -133,6 +141,11 @@ Tile(74, Colour.phase_1, Connect(NW, SE, Town(value=10), DottedTrack))
 Tile(77, Colour.phase_1, Connect(NE, SE, DottedTrack))
 Tile(78, Colour.phase_1, Connect(N, SE, DottedTrack))
 Tile(79, Colour.phase_1, Connect(NW, SE, DottedTrack))
+Tile(87, Colour.phase_2, Town('A', value=10), Connect(N, S), Connect('A', NE), Connect('A', SE))
+Tile(88, Colour.phase_2, Town('A', value=10), Connect(N, S), Connect(NW, SE))
+Tile(114, Colour.phase_1, Connect(NW, SW, Town(value=10)), Connect(N, NE, Town(value=10)))
+Tile(115, Colour.phase_1, City('A', value=20), Connect(S, 'A'))
+# Tile(169, Colour.phase_4, Connect(N, S), Connect(NW, SE), Connect(SW, ????))
 Tile(624, Colour.phase_2, Connect(S, SE), Connect(S, SW))
 Tile(644, Colour.phase_1, City('A', value=20), Connect('A', S), Connect('A', SE, DottedTrack))
 Tile(645, Colour.phase_1, City('A', value=20), Connect('A', SW), Connect('A', SE, DottedTrack))
