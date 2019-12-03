@@ -20,9 +20,32 @@ import Output
 import OutputFunctions
 
 
-def create_18Africa(outfile='18Africa'):
+class Contract(Paper.Certificate):
+    def __init__(self, name, origin, destination, value, icon, colour):
+        super().__init__(colour, icon=icon, name=name)
+        Draw.text(self.canvas, (20*mm, 20*mm), origin, TextStyle(Font.normal, Colour.black))
+        Draw.text(self.canvas, (20*mm, 25*mm), destination, TextStyle(Font.normal, Colour.black))
+        Draw.text(self.canvas, (35*mm, 30*mm), f'+{value}', TextStyle(Font.normal, Colour.black))
+
+
+def create_18africa(outfile='18Africa'):
     license_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'LICENSE.txt')
     game = Game.Game(name="18Africa", author='Jeff Edmunds', license_file=license_file)
+
+    game.add_paper(Contract('Minerals', origin='Western Ahaggar', destination='Casablanca',
+                            value=40, icon='misc/carriages/hopper.svg', colour=Colour.grey))
+    game.add_paper(Contract('Copper', origin='Zambesi Head', destination='Luanda or Dar Es Salaam',
+                            value=70, icon='misc/carriages/hopper.svg', colour=Colour.orange))
+    game.add_paper(Contract('Dates', origin='Fez/Mekn\u00E8s', destination='Tunis',
+                            value=30, icon='misc/carriages/freight.svg', colour=Colour.red))
+    game.add_paper(Contract('Gold', origin='Johannesburg', destination='Cape Town',
+                            value=30, icon='misc/carriages/freight.svg', colour=Colour.brown))
+    game.add_paper(Contract('Cotton', origin='Addis Abeba', destination='Djibouti',
+                            value=100, icon='misc/carriages/freight.svg', colour=Colour.white))
+    game.add_paper(Contract('Oil', origin='Abidjan', destination='Lagos',
+                            value=30, icon='misc/carriages/tank.svg', colour=Colour.black))
+    game.add_paper(Contract('Natural Gas', origin='Kufra', destination='Tripoli',
+                            value=50, icon='misc/carriages/tank.svg', colour=Colour.lightblue))
 
     ar = Company.Company(name="Alexandria Railway", abbreviation="A",
                          colour=Colour.red, # logo='free/xxx.png',
@@ -273,8 +296,7 @@ def create_18Africa(outfile='18Africa'):
     map.add_hexag(coords="R17")
     map.add_hexag(coords="R19", hexag=Hex(Connect(N, NW, Town(name='Mogadishu', value=10)), colour=Colour.phase_4))
 
-
-    map.add_element(Misc.RoundIndicator(Colour.phase_1, Colour.phase_2, Colour.phase_3), 'bottom right')
+    map.add_element(Misc.RoundIndicator(Colour.white, Colour.white), 'bottom right')
     map.add_element(Misc.Name(game), 'top right')
     game.add_token(Misc.round_indicator_token())
 
@@ -367,4 +389,4 @@ def create_18Africa(outfile='18Africa'):
 
 
 if __name__ == '__main__':
-    create_18Africa()
+    create_18africa()

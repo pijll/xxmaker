@@ -17,11 +17,8 @@ class Train:
         self.text = text
 
     def paper(self):
-        paper = Paper.Paper()
+        paper = Paper.Certificate(colour=self.colour)
         c = paper.canvas
-
-        Draw.rectangle(c, (0, 0), paper.width, paper.height, FillStyle(self.colour.faded()))
-        Draw.rectangle(c, (3*mm, 0), 13*mm, paper.height, FillStyle(self.colour))
 
         font = Font.train_letter.made_to_fit(self.name, c, 12.5*mm)
         Draw.text(c, (9.5*mm, 7*mm), self.name, TextStyle(font, Colour.black, 'center', 'center'))

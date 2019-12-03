@@ -1,6 +1,10 @@
+import Colour
+import Font
+import OutputFunctions
 from Definitions import *
 import Draw
 from math import ceil
+from Draw import LineStyle, FillStyle, TextStyle
 
 
 class Paper:
@@ -38,3 +42,26 @@ class Paper:
 
                 paper_part.canvas.draw(self.canvas, (-column * width_map_part, -row * height_map_part))
                 yield paper_part
+
+
+class Certificate(Paper):
+    def __init__(self, colour, price=None, name=None, icon=None):
+        super().__init__()
+        self.colour = colour
+
+        c = self.canvas
+        Draw.rectangle(c, (0, 0), self.width, self.height, FillStyle(colour.faded()))
+        Draw.rectangle(c, (3*mm, 0), 13*mm, self.height, FillStyle(colour))
+
+        if name:
+            y = self.height/2 if price else 14*mm
+            OutputFunctions.draw_centered_lines(name, Font.certificate_name, c,
+                                                    x_c=(self.width + 16*mm)/2, y=y,
+                                                    width=self.width - 16*mm - 6*mm)
+
+        if price:
+            Draw.text(c, (self.width - 3*mm, 2.8*mm), price,
+                      TextStyle(Font.price, Colour.black, 'top', 'right'))
+
+        if icon:
+            Draw.load_image(c, icon, (9.5*mm, 7*mm), width=10*mm, height=10*mm)

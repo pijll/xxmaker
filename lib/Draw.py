@@ -301,5 +301,6 @@ def convert_svg_to_png(complete_filename):
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.png')
     filename_png = temp_file.name
     temp_file.close()
+    # TODO: better transparency (this gives white outlines in an anti-aliased image)
     subprocess.run(['convert', complete_filename, '-transparent', 'white', filename_png])
     return filename_png
