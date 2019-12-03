@@ -17,7 +17,7 @@ hexag_size = 40 * mm  # edge to edge
 
 class Hexag:
     def __init__(self, *args, colour=None, size=None, outline=True, label=None, label_location=None,
-                 orientation=None, cost=None, no_border=None, row=None, column=None):
+                 orientation=None, cost=None, no_border=None, row=None, column=None, icon=None):
         self.size = size or hexag_size
         self.canvas = None
         self.colour = colour or Colour.background
@@ -29,6 +29,7 @@ class Hexag:
         self.no_border = no_border or []
         self.row = row
         self.column = column
+        self.icon = icon
 
         self.revenuelocations = []
         self.connections = []
@@ -163,6 +164,9 @@ class Hexag:
                 # x, y = (0.7, 0.05)
                 x, y = (-0.5, -0.75)
             Draw.text(self.canvas, (x*h, y*h), self.label, TextStyle(Font.label, Colour.black, 'center', 'center'))
+
+        if self.icon:
+            self.canvas.draw(self.icon, (-0.5, 0.4))
 
         if self.outline:
             hex_edges = list(tile_sides(self.orientation))

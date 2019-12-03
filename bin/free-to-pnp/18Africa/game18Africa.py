@@ -29,6 +29,14 @@ class Contract(Paper.Certificate):
         Draw.text(self.canvas, (20*mm, 25*mm), destination, TextStyle(Font.normal, Colour.black))
         Draw.text(self.canvas, (35*mm, 30*mm), f'+{value}', TextStyle(Font.normal, Colour.black))
 
+    @property
+    def icon(self):
+        canvas = Draw.Canvas((0, 0), 2 * logo_radius, 2 * logo_radius)
+        Draw.circle(canvas, (logo_radius, logo_radius), logo_radius, Draw.FillStyle(self.colour))
+        Draw.text(canvas, (logo_radius, logo_radius), self.name,
+                  TextStyle(Font.very_small, Colour.black, 'center', 'center'))
+        return canvas
+
 
 class Port(Hexag.External):
     def __init__(self, links, resource):
@@ -144,13 +152,13 @@ def create_18africa(outfile='18Africa'):
 
     map.add_hexag(coords="E2", hexag=Hex(Connect(SW, SE, City('A', name='Tangier', value='?+00', companies=[tch])),
                                          Connect('A', S), colour=Colour.phase_4))
-    map.add_hexag(coords="E4", hexag=Hex(Town(name='Mekn\u00E8s'), Town(name='Fez')))
+    map.add_hexag(coords="E4", hexag=Hex(Town(name='Mekn\u00E8s'), Town(name='Fez'), icon=dates.icon))
     map.add_hexag(coords="E6")
     map.add_hexag(coords="E8")
     map.add_hexag(coords="E10")
     map.add_hexag(coords="E12", hexag=Hex(Hill(20)))
     map.add_hexag(coords="E14")
-    map.add_hexag(coords="E16", hexag=Hex(Town(name='Abidjan')))
+    map.add_hexag(coords="E16", hexag=Hex(Town(name='Abidjan'), icon=oil.icon))
 
     map.add_hexag(coords="F3", hexag=Hex(Town(name='Oran')))
     map.add_hexag(coords="F5")
@@ -164,7 +172,7 @@ def create_18africa(outfile='18Africa'):
                                          colour=Colour.phase_4))
     map.add_hexag(coords="G4")
     map.add_hexag(coords="G6")
-    map.add_hexag(coords="G8", hexag=Hex(Hill(30)))
+    map.add_hexag(coords="G8", hexag=Hex(Hill(30), icon=minerals.icon))
     map.add_hexag(coords="G10")
     map.add_hexag(coords="G12", hexag=Hex(Water(30)))
     map.add_hexag(coords="G14", hexag=Hex(Water(50)))
@@ -238,7 +246,7 @@ def create_18africa(outfile='18Africa'):
 
     map.add_hexag(coords="L5", hexag=Hex(Town(name='Benghazi')))
     map.add_hexag(coords="L7")
-    map.add_hexag(coords="L9", hexag=Hex(Town(name='Kufra')))
+    map.add_hexag(coords="L9", hexag=Hex(Town(name='Kufra'), icon=gas.icon))
     map.add_hexag(coords="L11")
     map.add_hexag(coords="L13")
     map.add_hexag(coords="L15")
@@ -262,12 +270,12 @@ def create_18africa(outfile='18Africa'):
     map.add_hexag(coords="M18", hexag=Hex(Town(name='Wau'), Town(name='Juba')))
     map.add_hexag(coords="M20", hexag=Hex(Hill(20)))
     map.add_hexag(coords="M22", hexag=Hex(colour=Colour.phase_4))
-    map.add_hexag(coords="M24")
+    map.add_hexag(coords="M24", hexag=Hex(icon=copper.icon))
     map.add_hexag(coords="M26", hexag=Hex(Water(30), Town(name="Lusaka")))
     map.add_hexag(coords="M28", hexag=Hex(Town(name='Bulawayo')))
     map.add_hexag(coords="M30")
     map.add_hexag(coords="M32", hexag=Hex(City(name='Pretoria', companies=[csa]),
-                                          City(name='Johannesburg', companies=[nza]), Colour.yellow))
+                                          City(name='Johannesburg', companies=[nza]), Colour.yellow, icon=gold.icon))
     map.add_hexag(coords="M34", hexag=Hex(Hill(30), Town(name="Port Elizabeth")))
 
     map.add_hexag(coords='N5', hexag=Hex(City('A', name='Alexandria', value='?+30', x=-0.3, y=-0.3, companies=[ar]),
@@ -301,7 +309,7 @@ def create_18africa(outfile='18Africa'):
 
     map.add_hexag(coords="P11", hexag=Hex(Connect(NW, S, Town(name='Port Sudan', value=10)), colour=Colour.phase_4))
     map.add_hexag(coords="P13", hexag=Hex(Town(name='Asmara'), Hill(30)))
-    map.add_hexag(coords="P15", hexag=Hex(Town(name='Addis Abeba'), Hill(30)))
+    map.add_hexag(coords="P15", hexag=Hex(Town(name='Addis Abeba'), Hill(30), icon=cotton.icon))
     map.add_hexag(coords="P17", hexag=Hex(Hill(30)))
     map.add_hexag(coords="P19")
     map.add_hexag(coords='P21', hexag=Hex(City(name='Mombasa', companies=[ear])))
