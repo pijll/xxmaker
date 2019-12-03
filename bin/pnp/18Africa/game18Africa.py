@@ -52,8 +52,8 @@ class Port(Hexag.External):
 
 
 def create_18africa(outfile='18Africa'):
-    license_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'LICENSE.txt')
-    game = Game.Game(name="18Africa", author='Jeff Edmunds', license_file=license_file)
+    credits_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'CREDITS.txt')
+    game = Game.Game(name="18Africa", author='Jeff Edmunds', credits_file=credits_file)
 
     minerals = Contract('Minerals', origin='Western Ahaggar', destination='Casablanca',
                             value=40, icon='misc/carriages/hopper.svg', colour=Colour.grey)

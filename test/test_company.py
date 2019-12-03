@@ -2,14 +2,15 @@ import unittest
 
 import Game
 import Company
+import Colour
 
 
 class TestCompany(unittest.TestCase):
     def test_standard_company(self):
-        # Arrannge
+        # Arrange
 
         # Act
-        company = Company.Company("Some Railroad")
+        company = Company.Company("Some Railroad", abbreviation="SR", colour=Colour.red)
 
         # Assert
         self.assertEqual("Some Railroad", company.name, "Name")
@@ -17,13 +18,13 @@ class TestCompany(unittest.TestCase):
 
     def test_add_to_game(self):
         # Arrange
-        game = Game.Game("1801")
-        company = Company.Company("Some Railroad")
+        game = Game.Game("1801", "author", "credits")
+        company = Company.Company("Some Railroad", abbreviation="SR", colour=Colour.red)
 
         # Act
         game.add_company(company)
 
         # Assert
         self.assertEqual(1, len(game.companies), "Number of companies")
-        self.assertEqual("Some Railroad", game.companies[0].name)
+        self.assertEqual("Some Railroad", game.companies["SR"].name)
 

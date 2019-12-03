@@ -13,10 +13,12 @@ import Stockmarket
 from Definitions import *
 import Misc
 import Draw
+import os
 
 
 def create_1849(output_file='1849'):
-    game = Game.Game(name="1849", author='Federico Vellani')
+    credits_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'CREDITS.txt')
+    game = Game.Game(name="1849", author='Federico Vellani', credits_file=credits_file)
 
     # TODO: implement costs of stations
     afg = Company.Company(name='Azienda Ferroviaria Garibaldi', abbreviation='AFG',

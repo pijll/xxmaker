@@ -16,8 +16,8 @@ import os
 
 
 def create_1800(output_file='1800'):
-    license_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'LICENSE.txt')
-    game = Game.Game(name="1800", author='Antonio Leal', license_file=license_file, currency='$')
+    credits_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'CREDITS.txt')
+    game = Game.Game(name="1800", author='Antonio Leal', credits_file=credits_file, currency='$')
 
     cs = Company.Company(name="Colorado and Southern", abbreviation="CS",
                          colour=Colour.green, logo='free/Colorado_and_Southern.png',
@@ -151,7 +151,7 @@ def create_1800(output_file='1800'):
 
     # replacement tile for 3-player expansion
     Tile.Tile(802, Colour.phase_2, Hexag.Connect(S, N, DoubleCity('A', value=40, name='Denver', name_location=(-0.5, 0.45), companies=[cm])),
-                            Hexag.Connect(NW, 'A'), Hexag.Connect(NE, 'A'))
+              Hexag.Connect(NW, 'A'), Hexag.Connect(NE, 'A'))
 
     tiles_numbers_3players = [5, 6, 12, 15, 802, 804]
 

@@ -1,0 +1,2 @@
+1849 is a game by Fedrico Vellani.
+This implementation is based on the pnp files posted at BoardGameGeek.com.

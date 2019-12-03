@@ -12,7 +12,7 @@ class LoadImageTest(unittest.TestCase):
 
         # assert
         self.assertTrue(retvalue)
-        self.assertEqual('Public domain image', canvas.license_info['test/X.png'].strip())
+        self.assertEqual('Public domain image', canvas.credits_info['test/X.png'].strip())
 
     def test_loadimage_unavailable(self):
         # arrange
@@ -24,13 +24,13 @@ class LoadImageTest(unittest.TestCase):
         # assert
         self.assertFalse(retvalue)
 
-    def test_loadimage_nolicense(self):
+    def test_loadimage_nocredits(self):
         # arrange
         canvas = Draw.Canvas((0,0), 500, 500)
 
         # act
-        with self.assertRaisesRegex(Exception, 'No license file found.*'):
-            Draw.load_image(canvas, 'test/NoLicense.png', (250, 250), 200, 200)
+        with self.assertRaisesRegex(Exception, 'No credits file found.*'):
+            Draw.load_image(canvas, 'test/NoCredits.png', (250, 250), 200, 200)
 
         # assert
         pass
