@@ -60,6 +60,14 @@ phase_4 = grey
 background = light_beige
 
 
+class Transparent(Colour):
+    def __init__(self):
+        pass
+
+
+transparent = Transparent()
+
+
 palette_xxpaper = {
     'black': (0, 0, 0),
     'white': (1, 1, 1),

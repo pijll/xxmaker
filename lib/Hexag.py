@@ -92,9 +92,11 @@ class Hexag:
 
         h = self.unit_length
         s = self.side_length
-        vertices = self.vertices()
-        points = [v.xy(unit_length=self.unit_length) for v in vertices]
-        Draw.polygon(c, points, FillStyle(colour=self.colour))
+
+        if self.colour != Colour.transparent:
+            vertices = self.vertices()
+            points = [v.xy(unit_length=self.unit_length) for v in vertices]
+            Draw.polygon(c, points, FillStyle(colour=self.colour))
 
         city = dict()
         for ct in self.revenuelocations:

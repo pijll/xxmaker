@@ -22,30 +22,45 @@ import OutputFunctions
 
 class Contract(Paper.Certificate):
     def __init__(self, name, origin, destination, value, icon, colour):
+        self.name = name
+        self.value = value
         super().__init__(colour, icon=icon, name=name)
         Draw.text(self.canvas, (20*mm, 20*mm), origin, TextStyle(Font.normal, Colour.black))
         Draw.text(self.canvas, (20*mm, 25*mm), destination, TextStyle(Font.normal, Colour.black))
         Draw.text(self.canvas, (35*mm, 30*mm), f'+{value}', TextStyle(Font.normal, Colour.black))
 
 
+class Port(Hexag.External):
+    def __init__(self, links, resource):
+        super().__init__(Colour.transparent, outline=False, links=links)
+        self.resource = resource
+
+    def draw(self):
+        super().draw()
+        Draw.load_image(self.canvas, 'misc/anchor.svg', (0,-0.2*self.unit_length), 12*mm, 12*mm)
+        Draw.text(self.canvas, (0, 0.3*self.unit_length), f'{self.resource.name}: +{self.resource.value}',
+                  TextStyle(Font.normal, Colour.black, 'center', 'center'))
+        return self.canvas
+
+
 def create_18africa(outfile='18Africa'):
     license_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'LICENSE.txt')
     game = Game.Game(name="18Africa", author='Jeff Edmunds', license_file=license_file)
 
-    game.add_paper(Contract('Minerals', origin='Western Ahaggar', destination='Casablanca',
-                            value=40, icon='misc/carriages/hopper.svg', colour=Colour.grey))
-    game.add_paper(Contract('Copper', origin='Zambesi Head', destination='Luanda or Dar Es Salaam',
-                            value=70, icon='misc/carriages/hopper.svg', colour=Colour.orange))
-    game.add_paper(Contract('Dates', origin='Fez/Mekn\u00E8s', destination='Tunis',
-                            value=30, icon='misc/carriages/freight.svg', colour=Colour.red))
-    game.add_paper(Contract('Gold', origin='Johannesburg', destination='Cape Town',
-                            value=30, icon='misc/carriages/freight.svg', colour=Colour.brown))
-    game.add_paper(Contract('Cotton', origin='Addis Abeba', destination='Djibouti',
-                            value=100, icon='misc/carriages/freight.svg', colour=Colour.white))
-    game.add_paper(Contract('Oil', origin='Abidjan', destination='Lagos',
-                            value=30, icon='misc/carriages/tank.svg', colour=Colour.black))
-    game.add_paper(Contract('Natural Gas', origin='Kufra', destination='Tripoli',
-                            value=50, icon='misc/carriages/tank.svg', colour=Colour.lightblue))
+    minerals = Contract('Minerals', origin='Western Ahaggar', destination='Casablanca',
+                            value=40, icon='misc/carriages/hopper.svg', colour=Colour.grey)
+    copper = Contract('Copper', origin='Zambesi Head', destination='Luanda or Dar es Salaam',
+                            value=70, icon='misc/carriages/hopper.svg', colour=Colour.orange)
+    dates = Contract('Dates', origin='Fez/Mekn\u00E8s', destination='Tunis',
+                            value=30, icon='misc/carriages/freight.svg', colour=Colour.red)
+    gold = Contract('Gold', origin='Johannesburg', destination='Cape Town',
+                            value=30, icon='misc/carriages/freight.svg', colour=Colour.brown)
+    cotton = Contract('Cotton', origin='Addis Abeba', destination='Djibouti',
+                            value=100, icon='misc/carriages/freight.svg', colour=Colour.white)
+    oil = Contract('Oil', origin='Abidjan', destination='Lagos',
+                            value=30, icon='misc/carriages/tank.svg', colour=Colour.black)
+    gas = Contract('Natural Gas', origin='Kufra', destination='Tripoli',
+                            value=50, icon='misc/carriages/tank.svg', colour=Colour.lightblue)
 
     ar = Company.Company(name="Alexandria Railway", abbreviation="A",
                          colour=Colour.red, # logo='free/xxx.png',
@@ -109,6 +124,7 @@ def create_18africa(outfile='18Africa'):
     map.add_hexag(coords="B11", hexag=Hex(Town()))
     map.add_hexag(coords="B13", hexag=Hex(Connect(N, SE, Town(value=10, name='Bissau')), colour=Colour.phase_4))
 
+    map.add_hexag(coords="C2", hexag=Port(links={SE}, resource=minerals))
     map.add_hexag(coords="C6", hexag=Hex(Town(name='Agadir')))
     map.add_hexag(coords="C8")
     map.add_hexag(coords="C10")
@@ -152,6 +168,7 @@ def create_18africa(outfile='18Africa'):
     map.add_hexag(coords="G14", hexag=Hex(Water(50)))
     map.add_hexag(coords="G16", hexag=Hex(Connect(NW, SE, City(name='Lagos', value='?+20', companies=[nr])),
                                           colour=Colour.phase_4))
+    map.add_hexag(coords="G18", hexag=Port(links={N}, resource=oil))
 
     map.add_hexag(coords="H1", hexag=Hex(Connect(SW, SE), colour=Colour.phase_4))
     map.add_hexag(coords="H3")
@@ -163,6 +180,7 @@ def create_18africa(outfile='18Africa'):
     map.add_hexag(coords="H15", hexag=Hex(Water(50)))
     map.add_hexag(coords="H17", hexag=Hex(Connect(NW, NE), colour=Colour.phase_4))
     map.add_hexag(coords="H19", hexag=Hex(Connect(SE, NE, Town(name='Libreville', value=10)), colour=Colour.phase_4))
+    map.add_hexag(coords="H23", hexag=Port(links={NE}, resource=copper))
 
     map.add_hexag(coords="I2", hexag=Hex(Connect(NW, SW, Town(name='Tunis', value=10)), colour=Colour.phase_4))
     map.add_hexag(coords="I4", hexag=Hex(Town(name='Tripoli')))
@@ -178,6 +196,8 @@ def create_18africa(outfile='18Africa'):
     map.add_hexag(coords="I24", hexag=Hex(Town(name='Lobito')))
     map.add_hexag(coords="I26", hexag=Hex(Town(name='Benguela')))
 
+    map.add_hexag(coords="J1", hexag=Port(links={SW}, resource=dates))
+    map.add_hexag(coords="J3", hexag=Port(links={SW}, resource=gas))
     map.add_hexag(coords="J5")
     map.add_hexag(coords="J7")
     map.add_hexag(coords="J9", hexag=Hex(Hill(30)))
@@ -194,6 +214,7 @@ def create_18africa(outfile='18Africa'):
     map.add_hexag(coords="J29", hexag=Hex(Town(name='Walvis Bay')))
     map.add_hexag(coords="J31", hexag=Hex(Town(name='L\u00FCderitz')))
     map.add_hexag(coords="J35", hexag=Hex(Connect(NE, SE), colour=Colour.phase_4))
+    map.add_hexag(coords="J37", hexag=Port(links={NE}, resource=gold))
 
     map.add_hexag(coords="K6")
     map.add_hexag(coords="K8")
@@ -282,7 +303,7 @@ def create_18africa(outfile='18Africa'):
     map.add_hexag(coords="P17", hexag=Hex(Hill(30)))
     map.add_hexag(coords="P19")
     map.add_hexag(coords='P21', hexag=Hex(City(name='Mombasa', companies=[ear])))
-    map.add_hexag(coords="P23", hexag=Hex(Connect(N, S, City(name='Dar Es Salaam', value='?+10', companies=[ur])),
+    map.add_hexag(coords="P23", hexag=Hex(Connect(N, S, City(name='Dar es Salaam', value='?+10', companies=[ur])),
                                           colour=Colour.phase_4))
     map.add_hexag(coords="P25")
     map.add_hexag(coords="P27")
@@ -291,7 +312,9 @@ def create_18africa(outfile='18Africa'):
     map.add_hexag(coords="Q16", hexag=Hex(Hill(30)))
     map.add_hexag(coords="Q18")
     map.add_hexag(coords="Q20", hexag=Hex(Connect(N, SW), colour=Colour.phase_4))
+    map.add_hexag(coords="Q24", hexag=Port(links={NW}, resource=copper))
 
+    map.add_hexag(coords="R13", hexag=Port(links={SW}, resource=cotton))
     map.add_hexag(coords="R15", hexag=Hex(Town(name='Berbera')))
     map.add_hexag(coords="R17")
     map.add_hexag(coords="R19", hexag=Hex(Connect(N, NW, Town(name='Mogadishu', value=10)), colour=Colour.phase_4))
