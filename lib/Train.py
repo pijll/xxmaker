@@ -30,8 +30,8 @@ class Train:
             Draw.text(c, (9.5 * mm, paper.height - 3*mm), self.rusted_by,
                       TextStyle(Font.train_rusted_by, Colour.black, 'bottom', 'center'))
 
-        self.image = self.image or 'trains/free/LocomotiveStreetsignDE.png'
+        self.image = self.image or 'trains/steam.svg'
         Draw.load_image(c, self.image, ((paper.width+16*mm)/2, (paper.height+10*mm)/2),
-                        paper.width - 32*mm, paper.height - 17*mm)
+                        paper.width - 25*mm, paper.height - 7*mm)
 
         return paper

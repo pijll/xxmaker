@@ -213,19 +213,19 @@ def create_1849(output_file='1849'):
 
     game.add_private(Private.Private('Societ\u00E0 Corriere Etnee', 20, 5,
                                      location_on_map='G13', abbreviation='SCE',
-                                     image=''))
+                                     image='misc/volcano.svg'))
     game.add_private(Private.Private('Studio di Ingegneria Giuseppe Incorpora', 45, 10,
                                      'Lay or upgrade standard track at half cost.',
-                                     image=''))
+                                     image='misc/track.svg'))
     game.add_private(Private.Private('Compagnia Navale Mediterranea', 75, 15,
                                      'Place +20 token on a port.',
-                                     image=''))
+                                     image='misc/anchor.svg'))
     game.add_private(Private.Private('Societ\u00E0 Marittima Siciliana', 110, 20,
                                      'Place tile and token on a coastal city.',
-                                     image=''))
+                                     image='misc/station.svg'))
     game.add_private(Private.Private("Reale Societ\u00E0 d'Affari", 150, 25,
                                      "Take the president's share\nof the 1st company.",
-                                     image=''))
+                                     image='misc/share_certificate.svg'))
 
     tiles_numbers = [3, 3, 3, 3, 4, 4, 4, 4, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9,
                      58, 58, 58, 58, 73, 73, 73, 73, 74, 74, 74, 77, 77, 77, 77, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78,
