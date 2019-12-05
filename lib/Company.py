@@ -107,7 +107,7 @@ class Company:
     def _make_logo_from_abbrev(self, abbreviation, radius):
         canvas = Draw.Canvas((0,0), 2*radius, 2*radius)
         Draw.circle(canvas, (radius, radius), radius, FillStyle(Colour.white))
-        Draw.circle(canvas, (radius, radius), radius*0.9, LineStyle(self.colour, 1*mm))
+        Draw.circle(canvas, (radius, radius), radius*0.9, LineStyle(self.colour, 0.5*mm))
 
         font = Font.certificate_name.made_to_fit(abbreviation, canvas, radius*1.6)
 

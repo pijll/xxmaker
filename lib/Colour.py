@@ -45,7 +45,7 @@ green = Colour(0, 1, 0)
 lightgreen = Colour(.7, 1, .7)
 darkgreen = Colour(0, .4, 0)
 blue = Colour(0, 0, 1)
-lightblue = Colour(.5, .5, 1)
+lightblue = Colour(0.6784, 0.8471, 0.9020)   # hollasch blue_light
 darkblue = Colour(0.4157, 0.3529, 0.8039)   # hollasch slate_blue
 purple = Colour(.5, .33, .5)
 
@@ -81,7 +81,6 @@ palette_xxpaper = {
     'red': (1.0000, 0.0100, 0.0500),       # hollasch/cadmium_red_light
     'blue': (0.1176, 0.5647, 1.0000),      # hollasch/dodger_blue
     'brown': (0.9569, 0.6431, 0.3765),    #sandy_brown
-    'lightblue': (.5, .5, 1),
     'orange': (1, 0.5, 0),
     'purple': (0.6275, 0.1255, 0.9412),    # hollasch/purple
     'light_beige': (0.9608, 0.9608, 0.8627),        # hollasch/leight_beige
