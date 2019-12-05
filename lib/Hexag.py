@@ -397,22 +397,26 @@ class Cost:
         self.x = x
         self.y = y
 
-    def draw(self, canvas, x, y):
+    def draw(self, canvas, x_default, y_default):
+        """Draw the image at the location given by self.x, self.y (or at default location)"""
+        x = self.x * 20*mm if self.x is not None else x_default     # TODO: unit_length
+        y = self.y * 20 * mm if self.y is not None else y_default
+
+        self.draw_at_xy(canvas, x, y)
+
+    def draw_at_xy(self, canvas, x, y):
+        """Draw the image at the given location."""
         pass
 
 
 class Hill(Cost):
-    def draw(self, canvas, x, y):
-        if self.x is not None:
-            x = self.x * 20*mm      # TODO: unit_length
-        if self.y is not None:
-            y = self.y * 20*mm
+    def draw_at_xy(self, canvas, x, y):
         Draw.triangle(canvas, (x, y), 10*mm, FillStyle(Colour.brown), LineStyle(Colour.black, 1))
         Draw.text(canvas, (x, y+2.5*mm), self.cost, TextStyle(Font.normal, Colour.black, 'bottom', 'center'))
 
 
 class Water(Cost):
-    def draw(self, canvas, x, y):
+    def draw_at_xy(self, canvas, x, y):
         Draw.triangle(canvas, (x, y), 10.5*mm, FillStyle(Colour.lightblue), LineStyle(Colour.black, 1))
         Draw.text(canvas, (x, y + 2.5 * mm), self.cost, TextStyle(Font.normal, Colour.black, 'bottom', 'center'))
 

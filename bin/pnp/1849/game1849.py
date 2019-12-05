@@ -157,7 +157,7 @@ def create_1849(output_file='1849'):
     for hexag in map.hexags.values():
         if hexag.cost:
             token = Draw.Canvas((0,0), 2*logo_radius, 2*logo_radius)
-            hexag.cost.draw(token, logo_radius, logo_radius)
+            hexag.cost.draw_at_xy(token, logo_radius, logo_radius)
 
             # token = OutputFunctions.put_image_on_token('../../../graphics/misc/WingedWheel.png', logo_radius)
             # OutputFunctions.draw_text(hexag.cost.cost, Font.normal, cairo.Context(token), 0, 0, 'center', 'center')
