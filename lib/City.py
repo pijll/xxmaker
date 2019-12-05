@@ -193,5 +193,5 @@ class Town(RevenueLocation):
 class Port(City):
     def draw(self, hexag):
         pass
-        # canvas = hexag.canvas
-        # Draw.load_image(canvas, '../../../graphics/misc/Anchor1.png', (0, 0), 12*mm, 12*mm)
+        canvas = hexag.canvas
+        Draw.load_image(canvas, 'misc/anchor.svg', (0, 0), 12*mm, 12*mm)

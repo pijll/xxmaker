@@ -144,7 +144,8 @@ def create_1849(output_file='1849'):
     city = City(name='Messina', value=30)
     map.add_hexag(coords='B14', hexag=Hex(city, Connect(city, S), Colour.phase_1, label='M'))
     map.add_hexag(coords='D14')
-    map.add_hexag(coords='L14', hexag=Hexag.External(Port(value=60), links={NW}, colour=Colour.lightblue))
+    # map.add_hexag(coords='L14', hexag=Hexag.External(Port(value=60), links={NW}, colour=Colour.lightblue))
+    map.add_hexag(coords='L14', hexag=Hexag.External(links={NW}, colour=Colour.lightblue))
 
     # TODO: Hex-divider
     map.add_hexag(coords='A15', hexag=Hex(Colour.phase_4, Connect(SW, S, WhiteTrack)))

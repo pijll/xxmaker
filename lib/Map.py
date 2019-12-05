@@ -30,6 +30,8 @@ class Map:
         self.background_scale = background_scale
         self.background_xy = background_xy
         self.coords_inverted = coords_inverted
+        self.top_row = None
+        self.left_column = None
 
     def add_hexag(self, coords=None, row=None, column=None, hexag=None):
         hexag = hexag or Hexag.empty()
@@ -41,11 +43,16 @@ class Map:
         hexag.row = row
         hexag.column = column
 
+        if self.top_row is None or row < self.top_row:
+            self.top_row = row
+        if self.left_column is None or column < self.left_column:
+            self.left_column = column
+
     def width_in_hexags(self):
-        return max(column for row, column in self.hexags.keys())
+        return max(column for row, column in self.hexags.keys()) - self.left_column + 1
 
     def height_in_hexags(self):
-        return max(row for row, column in self.hexags.keys())
+        return max(row for row, column in self.hexags.keys()) - self.top_row + 1
 
     def width(self):
         if self.orientation == Hexag.VERTICAL:
@@ -112,11 +119,11 @@ class Map:
 
     def position_of_hexag(self, row, column):
         if self.orientation == Hexag.VERTICAL:
-            y = row * hexag_size / 2 + self.margin
-            x = column * 1.5 * s + self.margin
+            y = (row - self.top_row + 1) * hexag_size / 2 + self.margin
+            x = (column - self.left_column + 1) * 1.5 * s + self.margin
         else:
-            y = row * 1.5 * s + self.margin
-            x = column * hexag_size / 2 + self.margin
+            y = (row - self.top_row + 1) * 1.5 * s + self.margin
+            x = (column - self.left_column + 1) * hexag_size / 2 + self.margin
         return x, y
 
     def add_element(self, element, location='top left'):
