@@ -8,7 +8,7 @@ import Private
 import Tile
 import Map
 import Hexag
-from Hexag import Hill, Water, Hexag as Hex
+from Hexag import Hill, Water, Hexag as Hex, Label
 from City import City, Town, DoubleCity
 import Stockmarket
 from Definitions import *
@@ -40,19 +40,19 @@ def create_1800(output_file='1800'):
 
     map2 = Map.Map(orientation=VERTICAL)
     game.add_map(map2)
-    map2.add_hexag(coords="A3", hexag=Hexag.External(City(name='Cheyenne', x=0, y=-0.2, name_location=(0, -0.5)), links={S},values=[10, 40, 70],
-                                                     value_location=(0, .4)))
-    map2.add_hexag(coords="C3", hexag=Hex(cost=Hill('$50')))
+    map2.add_hexag(coords="A3", hexag=Hexag.External(City(name='Cheyenne', x=0, y=-0.2, name_location=(0, -0.5)),
+                                                     links={S}, values=[10, 40, 70], value_location=(0, .4)))
+    map2.add_hexag(coords="C3", hexag=Hex(cost=Hill('50')))
     map2.add_hexag(coords="D2", hexag=Hex(Town()))
     map2.add_hexag(coords="D4", hexag=Hex(Town()))
     map2.add_hexag(coords="E1", hexag=Hex(City(companies=[dr])))
     map2.add_hexag(coords="E3", hexag=Hex(City(x=-0.5, y=0.2), City(x=0.5, y=0.2, name='Fort Collins', name_location=(-0.7, -0.6)),
-                                          label='OO', label_location=(.6, -.3), colour=Colour.phase_1))
+                                          Label('OO', (.6, -.3)), colour=Colour.phase_1))
     map2.add_hexag(coords="E5", hexag=Hex(City(companies=[cs])))
-    map2.add_hexag(coords="F2", hexag=Hex(cost=Water('$40')))
-    map2.add_hexag(coords="F4", hexag=Hex(cost=Water('$40')))
+    map2.add_hexag(coords="F2", hexag=Hex(cost=Water('40')))
+    map2.add_hexag(coords="F4", hexag=Hex(cost=Water('40')))
     map2.add_hexag(coords="G1", hexag=Hexag.External(links={N}, values=[10, 20, 30]))
-    map2.add_hexag(coords="G3", hexag=Hex(City(name='Denver'), cost=Water('$40')))
+    map2.add_hexag(coords="G3", hexag=Hex(City(name='Denver'), cost=Water('40')))
     map2.add_hexag(coords="G5", hexag=Hexag.External(links={N}, values=[10, 20, 30]))
     map2.add_hexag(coords='I3', hexag=Hexag.External(links={N}, values=[20, 30, 40]))
 
@@ -62,18 +62,19 @@ def create_1800(output_file='1800'):
 
     map3 = Map.Map(orientation=VERTICAL)
     game.add_map(map3)
-    map3.add_hexag(coords="A3", hexag=Hexag.External(City(name='Cheyenne'), links={S}, values=[10, 40, 70]))
-    map3.add_hexag(coords="C3", hexag=Hex(cost=Hill('$50')))
+    map3.add_hexag(coords="A3", hexag=Hexag.External(City(name='Cheyenne', x=0, y=-0.2, name_location=(0, -0.5)),
+                                                     links={S}, values=[10, 40, 70], value_location=(0, .4)))
+    map3.add_hexag(coords="C3", hexag=Hex(cost=Hill('50')))
     map3.add_hexag(coords="D2", hexag=Hex(Town()))
     map3.add_hexag(coords="D4", hexag=Hex(Town()))
     map3.add_hexag(coords="E1", hexag=Hex(City(companies=[dr])))
-    map3.add_hexag(coords="E3", hexag=Hex(City(x=-0.5, y=0), City(x=0.5, y=0, name='Fort Collins'),
-                                                  colour=Colour.phase_1))
+    map3.add_hexag(coords="E3", hexag=Hex(City(x=-0.5, y=0.2), City(x=0.5, y=0.2, name='Fort Collins', name_location=(-0.7, -0.6)),
+                                          Label('OO', (.6, -.3)), colour=Colour.phase_1))
     map3.add_hexag(coords="E5", hexag=Hex(City(companies=[cs])))
-    map3.add_hexag(coords="F2", hexag=Hex(cost=Water('$40')))
-    map3.add_hexag(coords="F4", hexag=Hex(cost=Water('$40')))
+    map3.add_hexag(coords="F2", hexag=Hex(cost=Water('40')))
+    map3.add_hexag(coords="F4", hexag=Hex(cost=Water('40')))
     map3.add_hexag(coords="G1", hexag=Hexag.External(links={N}, values=[10, 20, 30]))
-    map3.add_hexag(coords="G3", hexag=Hex(City(name='Denver'), cost=Water('$40')))
+    map3.add_hexag(coords="G3", hexag=Hex(City(name='Denver'), cost=Water('40')))
     map3.add_hexag(coords="G5", hexag=Hexag.External(links={N}, values=[10, 20, 30]))
     map3.add_hexag(coords="H2", hexag=Hexag.External(links={SE}, values=[10, 20, 30]))
     map3.add_hexag(coords="H4", hexag=Hexag.External(links={SW}, values=[10, 20, 30]))

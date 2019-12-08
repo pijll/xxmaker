@@ -274,6 +274,7 @@ class External(Hexag):
         self.name_location = name_location
         super().__init__(*args, colour=colour or self.default_colour, **kwargs)
 
+
     def draw(self):
         super().draw()
         c = self.canvas
@@ -301,6 +302,8 @@ class External(Hexag):
         if self.values:
             if self.value_location:
                 x_c, y_c = self.value_location
+            elif self.name and self.revenuelocations:
+                x_c, y_c = 0, 0.4
             elif self.name:
                 x_c, y_c = 0, 0.2
             else:
