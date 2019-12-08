@@ -22,8 +22,7 @@ class Hexag:
         self.canvas = None
         self.colour = colour or Colour.background
         self.outline = outline
-        self.label = label
-        self.label_location = label_location
+        self.label = Label(label, label_location) if label is not None else None
         self.cost = cost
         self.orientation = orientation
         self.no_border = no_border or []
@@ -47,6 +46,8 @@ class Hexag:
             elif isinstance(arg, Border):
                 self.borders.append(arg)
                 arg.hexag = self
+            elif isinstance(arg, Label):
+                self.label = arg
 
         self.map = None
 
@@ -158,12 +159,12 @@ class Hexag:
             self.cost.draw(c, 0, y)
 
         if self.label:
-            if self.label_location:
-                x, y = self.label_location
+            if self.label.location:
+                x, y = self.label.location
             else:
                 # x, y = (0.7, 0.05)
                 x, y = (-0.5, -0.75)
-            Draw.text(self.canvas, (x*h, y*h), self.label, TextStyle(Font.label, Colour.black, 'center', 'center'))
+            Draw.text(self.canvas, (x*h, y*h), self.label.text, TextStyle(Font.label, Colour.black, 'center', 'center'))
 
         if self.icon:
             self.canvas.draw(self.icon, (-0.5, 0.4))
@@ -445,6 +446,12 @@ class Border:
 
         Draw.line(canvas, (x+dx1, y+dy1), (x+dx2, y+dy2), LineStyle(self.colour or Colour.black,
                                                                      2*mm, end_cap = Draw.end_cap_round))
+
+
+class Label:
+    def __init__(self, text, location=None):
+        self.text = text
+        self.location = location
 
 
 empty = Hexag
