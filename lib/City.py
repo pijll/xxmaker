@@ -21,18 +21,20 @@ class RevenueLocation:
         self.y = y
         self.location = location
         self.name_location = name_location
-        self.value = value
-        self.value_location = value_location
+        if isinstance(value, Value):
+            self.value = value
+        else:
+            self.value = Value(value, value_location)
 
     def draw_value(self, hexag):
         if self.value is None:
             return
-        if self.value_location is None:
-            self.value_location = self.default_value_location
-        x = (self.x + self.value_location[0]) * hexag.unit_length
-        y = (self.y + self.value_location[1]) * hexag.unit_length
+        if self.value.location is None:
+            self.value.location = self.default_value_location
+        x = (self.x + self.value.location[0]) * hexag.unit_length
+        y = (self.y + self.value.location[1]) * hexag.unit_length
         c = hexag.canvas
-        Draw.text(c, (x,y), self.value, TextStyle(Font.city_value, Colour.black, 'exactcenter', 'exactcenter'))
+        Draw.text(c, (x,y), self.value.value, TextStyle(Font.city_value, Colour.black, 'exactcenter', 'exactcenter'))
         Draw.circle(c, (x,y), 3*mm, LineStyle(Colour.black, 1))
 
     def draw_name(self, hexag):
@@ -103,53 +105,43 @@ class TripleCity(City):
     default_value_location = (0.4, -0.7)
 
     def draw(self, hexag):
-        context = hexag.context
+        canvas = hexag.canvas
         city_radius = self.city_radius
 
         polygon = ((-1, -3**.5/3-1), (1, -3**.5/3-1), (1+3**.5/2, -3**.5/3+.5),
                    (3**.5/2, 2*3**.5/3+.5), (-3**.5/2, 2*3**.5/3+.5), (-1-3**.5/2, -3**.5/3+.5))
         points = [(x*city_radius, y*city_radius) for (x,y) in polygon]
-        Draw.polygon(context, points, FillStyle(Colour.white), LineStyle(Colour.black, self.border_width))
-        # for i, (x, y) in enumerate(polygon):
-        #     if i == 0:
-        #         context.move_to(x*city_radius, y*city_radius)
-        #     else:
-        #         context.line_to(x*city_radius, y*city_radius)
-        # context.close_path()
-        #
-        # Colour.white.use_in_context(context)
-        # context.set_line_width(self.border_width)
-        # context.fill_preserve()
-        # Colour.black.use_in_context(context)
-        # context.stroke()
+        Draw.polygon(canvas, points, FillStyle(Colour.white), LineStyle(Colour.black, self.border_width))
 
         city_locations = [(-1, -(3**.5)/3), (+1, -(3**.5)/3), (0, 2*(3**.5)/3)]
 
         for i, (x_1, y_1) in enumerate(city_locations):
             x = self.x*hexag.unit_length + x_1 * city_radius
             y = self.y*hexag.unit_length + y_1 * city_radius
-            City._draw_circle(context, x, y)
+            City._draw_circle(canvas, x, y)
 
             if len(self.companies) > i:
                 company = self.companies[i]
-                company.paint_logo(context, x, y)
+                company.paint_logo(canvas, x, y)
 
 
 class QuadCity(City):
     default_value_location = (0.45, -0.8)
 
     def draw(self, hexag):
-        context = hexag.context
+        context = hexag.canvas
         city_radius = self.city_radius
 
         Draw.polygon(context, [
-            (-2*city_radius, -1*city_radius)
-            (-1*city_radius, -2*city_radius)
-            (1*city_radius, -2*city_radius)
-            (2*city_radius, -1*city_radius)
-            (2*city_radius, 1*city_radius)
-            (1*city_radius, 2*city_radius)
-            (-1*city_radius, 2*city_radius)],
+            (-2*city_radius, -1*city_radius),
+            (-1*city_radius, -2*city_radius),
+            (1*city_radius, -2*city_radius),
+            (2*city_radius, -1*city_radius),
+            (2*city_radius, 1*city_radius),
+            (1*city_radius, 2*city_radius),
+            (-1*city_radius, 2*city_radius),
+            (-2*city_radius, 1*city_radius)
+        ],
                      FillStyle(Colour.white), LineStyle(Colour.black, self.border_width))
 
         city_locations = [(-1, -1), (+1, -1), (-1, +1), (+1, +1)]
@@ -186,8 +178,8 @@ class Town(RevenueLocation):
                       ((self.x + dx_bar/2)*hexag.unit_length, (self.y + dy_bar/2)*hexag.unit_length),
                       LineStyle(Colour.black, self.bar_width))
 
-            if self.value_location is None:
-                self.value_location = (dx_bar*1.2, dy_bar*1.2)
+            if self.value.location is None:
+                self.value.location = (dx_bar*1.2, dy_bar*1.2)
 
 
 class Port(City):
@@ -195,3 +187,9 @@ class Port(City):
         pass
         canvas = hexag.canvas
         Draw.load_image(canvas, 'misc/anchor.svg', (0, 0), 12*mm, 12*mm)
+
+
+class Value:
+    def __init__(self, value, location=None):
+        self.value = value
+        self.location = location

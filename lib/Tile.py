@@ -2,7 +2,7 @@ import Colour
 import cairo
 from Definitions import *
 from math import sqrt
-from City import Town, City, DoubleCity
+from City import Town, City, DoubleCity, TripleCity, QuadCity, Value
 import Hexag
 from Hexag import Connect, WhiteTrack, DottedTrack, Label
 import OutputFunctions
@@ -148,7 +148,20 @@ Tile(88, Colour.phase_2, Town('A', value=10), Connect(N, S), Connect(NW, SE))
 Tile(114, Colour.phase_1, Connect(NW, SW, Town(value=10, value_location=(0.4, 0.4))),
      Connect(N, NE, Town(value=10, value_location=(0.2, 0.6))))
 Tile(115, Colour.phase_1, City('A', value=20), Connect(S, 'A'))
-# Tile(169, Colour.phase_4, Connect(N, S), Connect(NW, SE), Connect(SW, ????))
+Tile(120, Colour.phase_2, Connect(NW, SW, City(value=Value(60, (0.55, 0.3)))),
+     Connect(N, NE, City(value=Value(60, (0.3, 0.55)))), Label('TOR', (0, 0.7)))
+Tile(121, Colour.phase_2, DoubleCity('A', value=50, value_location=(-0.4, 0.6)), Connect('A', NW), Connect('A', S), Connect('A', NE),
+     Label('LON/BAR', (0, -0.7)))
+Tile(122, Colour.phase_3, DoubleCity(id_='N', value=80, x=0, y=-0.6, value_location=(-0.7, 0.6)), Connect(NW, 'N'),
+     Connect(N, 'N'), DoubleCity(id_='S', value=80, x=0, y=0.6, value_location=(0.7, -0.6)),
+     Connect(S, 'S'), Connect(SW, 'S'), Label('TOR', (0, 0)))    # 1830
+Tile(123, Colour.phase_4, Connect(N, S, TripleCity('A', value=60)), Connect(NW, SE), Connect('A', SW),
+     Label('HAM', (-0.4, -0.7)))
+Tile(124, Colour.phase_4, Connect(SW, NE, QuadCity('A', value=100)), Connect('A', N), Connect('A', NW), Label('TOR', (0, 0.8)))
+Tile(125, Colour.phase_3, Connect(SE, NW, DoubleCity('A', value=40)), Connect(N, S), Connect('A', NE),
+     Label('L'))
+Tile(126, Colour.phase_3, Connect(SE, NW, DoubleCity(value=60)), Connect(N, S), Connect(SW, NE), Label('LON', (-0.4, -0.7)))
+Tile(127, Colour.phase_3, Connect(N, S, DoubleCity('A', value=60)), Connect(SW, NE), Connect('A', NW), Label('BAR', (-0.4, -0.7)))
 Tile(624, Colour.phase_2, Connect(S, SE), Connect(S, SW))
 Tile(644, Colour.phase_1, City('A', value=20), Connect('A', S), Connect('A', SE, DottedTrack))
 Tile(645, Colour.phase_1, City('A', value=20), Connect('A', SW), Connect('A', SE, DottedTrack))
