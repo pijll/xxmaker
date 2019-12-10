@@ -13,26 +13,37 @@ import Stockmarket
 from Definitions import *
 import Misc
 import Draw
+from Draw import LineStyle, TextStyle
+import Font
 import os
+
+
+def draw_token_costs(costs):
+    def draw(company, canvas, location):
+        x, y = location
+        length_of_line = company.n_stations * 2 * logo_radius + (company.n_stations-1) * company.token_interspace
+        Draw.line(canvas, (x - length_of_line/2, y + 2*mm),
+                  (x + length_of_line/2, y + 2*mm), LineStyle(Colour.black, 1))
+        Draw.text(canvas, (x, y+2*mm), costs, TextStyle(Font.normal, Colour.black, 'top', 'center'))
+    return draw
 
 
 def create_1849(output_file='1849'):
     credits_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'CREDITS.txt')
     game = Game.Game(name="1849", author='Federico Vellani', credits_file=credits_file)
 
-    # TODO: implement costs of stations
-    afg = Company.Company(name='Azienda Ferroviaria Garibaldi', abbreviation='AFG',
-                          colour=Colour.red, n_stations=3, logo='free/Garibaldi.svg')#, cost_of_stations=40)
-    ctl = Company.Company(name='Compagnia Trasporti Lilibeo', abbreviation='CTL',
-                          colour=Colour.yellow, n_stations=3, logo='free/Lilibeo.svg')#, cost_of_stations=40)
-    ift = Company.Company(name='Impresa Ferroviaria Trinacria', abbreviation='IFT',
-                          colour=Colour.blue, n_stations=3, logo='free/IFT_Trinacria.svg')#, cost_of_stations=90)
-    ata = Company.Company(name='Azienda Trasporti Archimede', abbreviation='ATA',
-                          colour=Colour.green, n_stations=3, logo='free/Archimede.svg')#, cost_of_stations=40)
-    rcs = Company.Company(name='Rete Centrale Sicula', abbreviation='RCS',
-                          colour=Colour.orange, n_stations=3, logo='free/Rete_Centrale_Sicula.svg')#, cost_of_stations=130)
-    sfa = Company.Company(name='Societ\u00E0 Ferroviaria Akragas', abbreviation='SFA',
-                          colour=Colour.pink, n_stations=3, logo='free/Akragas.svg')#, cost_of_stations=40)
+    afg = Company.Company(name='Azienda Ferroviaria Garibaldi', abbreviation='AFG', colour=Colour.red,
+                          n_stations=3, logo='free/Garibaldi.svg', token_costs=draw_token_costs(40))
+    ctl = Company.Company(name='Compagnia Trasporti Lilibeo', abbreviation='CTL', colour=Colour.yellow,
+                          n_stations=3, logo='free/Lilibeo.svg', token_costs=draw_token_costs(40))
+    ift = Company.Company(name='Impresa Ferroviaria Trinacria', abbreviation='IFT', colour=Colour.blue,
+                          n_stations=3, logo='free/IFT_Trinacria.svg', token_costs=draw_token_costs(90))
+    ata = Company.Company(name='Azienda Trasporti Archimede', abbreviation='ATA', colour=Colour.green,
+                          n_stations=3, logo='free/Archimede.svg', token_costs=draw_token_costs(30))
+    rcs = Company.Company(name='Rete Centrale Sicula', abbreviation='RCS', colour=Colour.orange,
+                          n_stations=3, logo='free/Rete_Centrale_Sicula.svg', token_costs=draw_token_costs(130))
+    sfa = Company.Company(name='Societ\u00E0 Ferroviaria Akragas', abbreviation='SFA', colour=Colour.pink,
+                          n_stations=3, logo='free/Akragas.svg', token_costs=draw_token_costs(40))
 
     game.add_company(afg, ctl, ift, ata, rcs, sfa)
 
@@ -41,8 +52,6 @@ def create_1849(output_file='1849'):
     map = Map.Map(orientation=VERTICAL)
     game.add_map(map)
 
-    # map.add_hexag(coords='C1', hexag=Hexag.External(City('A'), Connect('A', S, WhiteTrack), Connect('A', SE, WhiteTrack),
-    #     name='Trapani', colour=Colour.phase_4, values=[20, 30, 40], value_location=(0,-.5)))
     map.add_hexag(coords='C1', hexag=Hexag.External(Connect(S, SE, City('A'), WhiteTrack),
                                                     name='Trapani', name_location=(-.55, -.35), colour=Colour.phase_4,
                                                     values=[20, 30, 40], value_location=(-.6,0)))
@@ -158,9 +167,6 @@ def create_1849(output_file='1849'):
         if hexag.cost:
             token = Draw.Canvas((0,0), 2*logo_radius, 2*logo_radius)
             hexag.cost.draw_at_xy(token, logo_radius, logo_radius)
-
-            # token = OutputFunctions.put_image_on_token('../../../graphics/misc/WingedWheel.png', logo_radius)
-            # OutputFunctions.draw_text(hexag.cost.cost, Font.normal, cairo.Context(token), 0, 0, 'center', 'center')
             game.add_token(token)
 
     stockmarket = [

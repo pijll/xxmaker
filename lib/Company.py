@@ -50,19 +50,29 @@ class Company:
 
         Draw.rectangle(c, (margin, margin), width - 2*margin, height - 2*margin, LineStyle(Colour.black, 1*mm))
 
-        token_costs = self.token_costs or self.token_costs_default
+        if callable(self.token_costs):
+            self.token_costs(company=self, canvas=c,
+                             location=(margin + self.token_interspace*(self.n_stations+1)/2 + logo_radius*self.n_stations,
+                                       margin + height_namebar + self.token_interspace + 2 * logo_radius))
+            token_costs = None
+        elif self.token_costs:
+            token_costs = self.token_costs
+        else:
+            token_costs = self.token_costs_default
+
         for i in range(self.n_stations):
             x = margin + self.token_interspace*(i+1) + logo_radius*(2*i + 1)
             y = margin + height_namebar + self.token_interspace + logo_radius
             Draw.circle(c, (x,y), logo_radius, LineStyle(Colour.black, 0.6*mm))
 
-            try:
-                token_cost = token_costs[i]
-            except IndexError:
-                token_cost = token_costs[-1]
-            if token_cost:
-                Draw.text(c, (x, y+logo_radius), f'{self.game.currency}{token_cost}',
-                          TextStyle(Font.normal, Colour.black, 'top', 'center'))
+            if token_costs:
+                try:
+                    token_cost = token_costs[i]
+                except IndexError:
+                    token_cost = token_costs[-1]
+                if token_cost:
+                    Draw.text(c, (x, y+logo_radius), f'{self.game.currency}{token_cost}',
+                              TextStyle(Font.normal, Colour.black, 'top', 'center'))
 
         return charter
 
