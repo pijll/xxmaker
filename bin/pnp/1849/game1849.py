@@ -22,18 +22,17 @@ def create_1849(output_file='1849'):
 
     # TODO: implement costs of stations
     afg = Company.Company(name='Azienda Ferroviaria Garibaldi', abbreviation='AFG',
-                          colour=Colour.red, n_stations=3)#, cost_of_stations=40)
+                          colour=Colour.red, n_stations=3, logo='free/Garibaldi.svg')#, cost_of_stations=40)
     ctl = Company.Company(name='Compagnia Trasporti Lilibeo', abbreviation='CTL',
-                          colour=Colour.yellow, n_stations=3)#, cost_of_stations=40)
+                          colour=Colour.yellow, n_stations=3, logo='free/Lilibeo.svg')#, cost_of_stations=40)
     ift = Company.Company(name='Impresa Ferroviaria Trinacria', abbreviation='IFT',
-                          colour=Colour.blue, n_stations=3)#, cost_of_stations=90)
+                          colour=Colour.blue, n_stations=3, logo='free/IFT_Trinacria.svg')#, cost_of_stations=90)
     ata = Company.Company(name='Azienda Trasporti Archimede', abbreviation='ATA',
-                          colour=Colour.green, n_stations=3)#, cost_of_stations=40)
+                          colour=Colour.green, n_stations=3, logo='free/Archimede.svg')#, cost_of_stations=40)
     rcs = Company.Company(name='Rete Centrale Sicula', abbreviation='RCS',
-                          colour=Colour.orange, n_stations=3)#, cost_of_stations=130)
+                          colour=Colour.orange, n_stations=3, logo='free/Rete_Centrale_Sicula.svg')#, cost_of_stations=130)
     sfa = Company.Company(name='Societ\u00E0 Ferroviaria Akragas', abbreviation='SFA',
-                          colour=Colour.red, n_stations=3)#, cost_of_stations=40)
-    # Todo: kleuren van sfa en afg uit elkaar houden
+                          colour=Colour.pink, n_stations=3, logo='free/Akragas.svg')#, cost_of_stations=40)
 
     game.add_company(afg, ctl, ift, ata, rcs, sfa)
 

@@ -39,6 +39,7 @@ grey = Colour(0.5, 0.5, 0.5)
 black = Colour(0, 0, 0)
 
 red = Colour(1, 0, 0)
+pink = Colour(1.0000, 0.7137, 0.7569)   # hollasch pink_light
 orange = Colour(1, 0.5, 0)
 yellow = Colour(1, 1, 0)
 green = Colour(0, 1, 0)

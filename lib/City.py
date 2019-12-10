@@ -27,7 +27,7 @@ class RevenueLocation:
             self.value = Value(value, value_location)
 
     def draw_value(self, hexag):
-        if self.value is None:
+        if self.value.value is None:
             return
         if self.value.location is None:
             self.value.location = self.default_value_location
