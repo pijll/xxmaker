@@ -45,6 +45,7 @@ yellow = Colour(1, 1, 0)
 green = Colour(0, 1, 0)
 lightgreen = Colour(.7, 1, .7)
 darkgreen = Colour(0, .4, 0)
+turquoise = Colour(0.2510, 0.8784, 0.8157)  # hollasch
 blue = Colour(0, 0, 1)
 lightblue = Colour(0.6784, 0.8471, 0.9020)   # hollasch blue_light
 darkblue = Colour(0.4157, 0.3529, 0.8039)   # hollasch slate_blue

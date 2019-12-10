@@ -17,12 +17,11 @@ class Train:
         self.text = text
 
     def paper(self):
-        paper = Paper.Certificate(colour=self.colour)
+        paper = Paper.Certificate(colour=self.colour, price=self.price)
         c = paper.canvas
 
         font = Font.train_letter.made_to_fit(self.name, c, 12.5*mm)
         Draw.text(c, (9.5*mm, 7*mm), self.name, TextStyle(font, Colour.black, 'center', 'center'))
-        Draw.text(c, (paper.width - 3*mm, 2.8*mm), self.price, TextStyle(Font.price, Colour.black, 'top', 'right'))
 
         if self.rusted_by:
             Draw.text(c, (9.5 * mm, paper.height - 12*mm), 'Rusted', TextStyle(Font.small, Colour.black, 'bottom', 'center'))

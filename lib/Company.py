@@ -83,27 +83,14 @@ class Company:
             yield self._share_paper(percentage=int(100/self.num_shares))
 
     def _share_paper(self, percentage, director=False):
-        share = Paper.Paper()
+        share = Paper.Certificate(colour=self.colour, price=self.par_price, name=self.name)
         c = share.canvas
-
-        Draw.rectangle(c, (0,0), share.width, share.height, FillStyle(self.colour.faded()))
-        Draw.rectangle(c, (3*mm,0), 13*mm, share.height, FillStyle(self.colour))
-
-        y = share.height/2 if self.par_price else 14*mm
-        OutputFunctions.draw_centered_lines(self.name, Font.certificate_name, c,
-                                                x_c=(share.width + 16*mm)/2, y=y,
-                                                width=share.width - 16*mm - 6*mm)
 
         number_of_shares = 'Two shares' if director else 'One share'
         Draw.text(c, (19*mm, share.height-3*mm), number_of_shares,
                   TextStyle(Font.normal, Colour.black, 'bottom', 'left'))
         Draw.text(c, (share.width-3*mm, share.height-3*mm), f'{percentage}%',
                   TextStyle(Font.normal, Colour.black, 'bottom', 'right'))
-
-        if self.par_price:
-            price = 2*self.par_price if director else self.par_price
-            Draw.text(c, (share.width - 3*mm, 2.8*mm), price,
-                      TextStyle(Font.price, Colour.black, 'top', 'right'))
 
         self.paint_logo(c, 9.5*mm, 11.5*mm)
         if director:
