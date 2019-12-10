@@ -155,8 +155,13 @@ def create_1849(output_file='1849'):
     # map.add_hexag(coords='L14', hexag=Hexag.External(Port(value=60), links={NW}, colour=Colour.lightblue))
     map.add_hexag(coords='L14', hexag=Hexag.External(links={NW}, colour=Colour.lightblue))
 
-    # TODO: Hex-divider
-    map.add_hexag(coords='A15', hexag=Hex(Colour.phase_4, Connect(SW, S, WhiteTrack)))
+    # This hexag is divided in two, with a line from the NE to the SW corner
+    hexag = Hex(Colour.phase_4, Connect(SW, S, WhiteTrack))
+    map.add_hexag(coords='A15', hexag=hexag)
+    vertices = hexag.vertices()
+    ne_corner, sw_corner = vertices[5], vertices[2]
+    Draw.line(hexag.draw(), ne_corner.xy(hexag.unit_length), sw_corner.xy(hexag.unit_length), LineStyle(Colour.black, 1))
+
     map.add_hexag(coords='C15', hexag=Hexag.External(Colour.phase_4, links={N},  name='Calabria', values=[10,30,90]))
 
     map.add_element(Misc.RoundIndicator(Colour.phase_1, Colour.phase_2, Colour.phase_3), 'bottom right')
