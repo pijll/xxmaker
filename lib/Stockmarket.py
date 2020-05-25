@@ -17,7 +17,8 @@ class Stockmarket:
         self.cells = dict()
         for i, row in enumerate(cells):
             for j, val in enumerate(row):
-                self.cells[i, j] = Cell(row=i, column=j, value=val, stockmarket=self)
+                if val is not None:
+                    self.cells[i, j] = Cell(row=i, column=j, value=val, stockmarket=self)
 
         for cell in self.cells.values():
             if (cell.row, cell.column-1) not in self.cells and \

@@ -1,0 +1,5 @@
+1836Jr is a game by David Hecht.
+This implementation is based on the pnp files posted at BoardGameGeek.com.
+A number of (non-functional) changes have been made, such as names of
+companies and cities, to match the actual railway history and geography of the
+area.

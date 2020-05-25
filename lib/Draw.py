@@ -27,7 +27,8 @@ class Canvas:
         self.credits_info = {}
 
     def draw(self, canvas, location, black_and_white=False, alpha=None, rotated=False):
-        """Paint one canvas on the other, at location x,y = location."""
+        """Paint one canvas on the other, at location x,y = location. (Top right corner)"""
+
         # Copy credits info to this canvas
         self.credits_info.update(canvas.credits_info)
 
@@ -258,7 +259,7 @@ def text(canvas, location, txt, textstyle):
     context.stroke()
 
 
-def load_image(canvas, filename, center, width, height, circle_clip=False):
+def load_image(canvas, filename, center, width, height, zoom=1, circle_clip=False):
     """Filename should be relative to the graphics directory."""
     home_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     complete_filename = os.path.join(home_dir, 'graphics', filename)
@@ -285,14 +286,14 @@ def load_image(canvas, filename, center, width, height, circle_clip=False):
     img_width = image.get_width()
     img_height = image.get_height()
 
-    scale = min(width / image.get_width(), height / image.get_height())
+    scale = min(width / image.get_width() * zoom, height / image.get_height() * zoom)
 
     context = canvas.context
     context.save()
     context.scale(scale, scale)
     context.set_source_surface(image, center[0]/scale - img_width/2, center[1]/scale - img_height/2)
     if circle_clip:
-        context.arc(center[0]/scale, center[1]/scale, max(img_width, img_height)/2, 0, 6.29)
+        context.arc(center[0]/scale, center[1]/scale, max(img_width, img_height)/2/zoom, 0, 6.29)
         context.clip()
     context.paint()
     context.restore()

@@ -15,8 +15,9 @@ class Company:
     token_costs_default = ['', 40, 100]
     token_interspace = 4*mm
 
-    def __init__(self, name, abbreviation, colour, n_stations=0, num_shares=10, logo=None, token_costs=None,
-                 par_price=None):
+    def __init__(self, name, abbreviation, colour, n_stations=0, num_shares=10,
+                 logo=None, logo_zoom=1, token_costs=None,
+                 par_price=None, marker=None):
         self.name = name
         self.abbreviation = abbreviation
         self.colour = colour
@@ -24,11 +25,12 @@ class Company:
         self.num_shares = num_shares
         self.token_costs = token_costs
         if logo:
-            self.logo = self._make_logo_from_image('companies/' + logo, radius=logo_radius)
+            self.logo = self._make_logo_from_image('companies/' + logo, radius=logo_radius, zoom=logo_zoom)
         else:
             self.logo = self._make_logo_from_abbrev(self.abbreviation, radius=logo_radius)
         self.game = None
         self.par_price = par_price
+        self.marker = marker
 
     def charter(self):
         width = 130 * mm
@@ -38,7 +40,7 @@ class Company:
         width_train_section = 0.4 * width
         height_tokenbar = height_namebar
 
-        charter = Paper.Paper(width, height)
+        charter = Paper.Paper(width, height, marker=self.marker)
 
         c = charter.canvas
 
@@ -83,7 +85,7 @@ class Company:
             yield self._share_paper(percentage=int(100/self.num_shares))
 
     def _share_paper(self, percentage, director=False):
-        share = Paper.Certificate(colour=self.colour, price=self.par_price, name=self.name)
+        share = Paper.Certificate(colour=self.colour, price=self.par_price, name=self.name, marker=self.marker)
         c = share.canvas
 
         number_of_shares = 'Two shares' if director else 'One share'
@@ -98,8 +100,8 @@ class Company:
 
         return share
 
-    def _make_logo_from_image(self, logo_file, radius):
-        return OutputFunctions.put_image_on_token(logo_file, radius)
+    def _make_logo_from_image(self, logo_file, radius, zoom=1):
+        return OutputFunctions.put_image_on_token(logo_file, radius, zoom)
 
     def _make_logo_from_abbrev(self, abbreviation, radius):
         canvas = Draw.Canvas((0,0), 2*radius, 2*radius)

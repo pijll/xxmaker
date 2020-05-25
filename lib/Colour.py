@@ -93,5 +93,22 @@ palette_xxpaper = {
     'background': 'light_beige'
 }
 
+palette_18al_galt = {
+    'yellow': (1, .96, 0),      # fff500
+    'phase_1': 'yellow',
+    'green': (.33, .85, .17),   # 54d92b
+    'phase_2': 'green',
+    'russet': (.67, .45, .16),  # ab7329
+    'phase_3': 'russet',
+    'grey': (.75, .75, .75),    # bfbfbf
+    'phase_4': 'grey',
+
+
+    'pink': (.8, .2, .4),       # cc3366
+    'purple': (.6, .4, .8),     # 9966cc
+    'turquoise': (.2, 1, .8),   # 33ffcc
+    'orange': (.94, .61, .29),  # f09c4a
+}
+
 
 set_palette(palette_xxpaper)

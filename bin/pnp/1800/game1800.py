@@ -13,9 +13,14 @@ from City import City, Town, DoubleCity
 import Stockmarket
 from Definitions import *
 import os
+import Draw
+from Draw import FillStyle
 
 
 def create_1800(output_file='1800'):
+    three_players = Draw.Canvas((0,0), 3*mm, 3*mm)
+    Draw.triangle(three_players, (1.5*mm, 1.7*mm), 2.8*mm, FillStyle(Colour.grey))
+
     credits_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'CREDITS.txt')
     game = Game.Game(name="1800", author='Antonio Leal', credits_file=credits_file, currency='$')
 
@@ -30,7 +35,7 @@ def create_1800(output_file='1800'):
     # I've replaced it with the Colorado Midland, based in Colorado Springs
     cm = Company.Company(name="Colorado Midland", abbreviation="CM",
                          colour=Colour.blue, logo='free/Colorado_Midland.png',
-                         n_stations=3)
+                         n_stations=3, marker=three_players)
 
     game.add_company(cs)
     game.add_company(dr)
@@ -60,7 +65,7 @@ def create_1800(output_file='1800'):
     map2.add_element(Misc.Name(game), 'top left')
     game.add_token(Misc.round_indicator_token())
 
-    map3 = Map.Map(orientation=VERTICAL)
+    map3 = Map.Map(orientation=VERTICAL, marker=three_players)
     game.add_map(map3)
     map3.add_hexag(coords="A3", hexag=Hexag.External(City(name='Cheyenne', x=0, y=-0.2, name_location=(0, -0.5)),
                                                      links={S}, values=[10, 40, 70], value_location=(0, .4)))

@@ -8,16 +8,16 @@ from Draw import LineStyle, FillStyle, TextStyle
 
 
 class Paper:
-    def __init__(self, width=63*mm, height=39*mm):
+    def __init__(self, width=63*mm, height=39*mm, marker=None):
         self.width = width
         self.height = height
 
         self.canvas = Draw.Canvas((0,0), width, height)
 
-        # self.surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, cairo.Rectangle(0, 0, width, height))
-        # self.context = cairo.Context(self.surface)
-        #
-        # self.font_map = PangoCairo.FontMap.get_default()
+        if isinstance(marker, Draw.Canvas):
+            self.canvas.draw(marker, (2*mm, height - 2*mm))
+        elif marker is not None:
+            Draw.text(self.canvas, (0, height), marker, TextStyle(Font.very_small, Colour.grey, 'bottom', 'left'))
 
     def split_into_parts(self, max_width, max_height):
         def how_many_fit(large, small):
@@ -45,13 +45,18 @@ class Paper:
 
 
 class Certificate(Paper):
-    def __init__(self, colour, price=None, name=None, icon=None):
+    def __init__(self, colour, price=None, name=None, icon=None, marker=None):
         super().__init__()
         self.colour = colour
 
         c = self.canvas
         Draw.rectangle(c, (0, 0), self.width, self.height, FillStyle(colour.faded()))
         Draw.rectangle(c, (3*mm, 0), 13*mm, self.height, FillStyle(colour))
+
+        if isinstance(marker, Draw.Canvas):
+            self.canvas.draw(marker, (0, self.height - 3*mm))
+        elif marker is not None:
+            Draw.text(self.canvas, (0, self.height), marker, TextStyle(Font.very_small, Colour.grey, 'bottom', 'left'))
 
         if name:
             y = self.height/2 if price else 14*mm

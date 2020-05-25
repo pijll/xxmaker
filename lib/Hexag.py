@@ -164,7 +164,7 @@ class Hexag:
             else:
                 # x, y = (0.7, 0.05)
                 x, y = (-0.5, -0.75)
-            Draw.text(self.canvas, (x*h, y*h), self.label.text, TextStyle(Font.label, Colour.black, 'center', 'center'))
+            Draw.text(self.canvas, (x*h, y*h), self.label.text, TextStyle(Font.label, Colour.black, 'center', 'left'))
 
         if self.icon:
             self.canvas.draw(self.icon, (-0.5, 0.4))

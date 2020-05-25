@@ -21,7 +21,7 @@ class Map:
     margin = 10*mm
 
     def __init__(self, orientation, background=None, background_scale=None, background_xy=None,
-                 coords_inverted=False):
+                 coords_inverted=False, marker=None):
         self.orientation = orientation
         self.hexags = dict()
         self.game = None
@@ -32,6 +32,7 @@ class Map:
         self.coords_inverted = coords_inverted
         self.top_row = None
         self.left_column = None
+        self.marker = marker
 
     def add_hexag(self, coords=None, row=None, column=None, hexag=None):
         hexag = hexag or Hexag.empty()
@@ -67,7 +68,7 @@ class Map:
             return (self.height_in_hexags() * 1.5 + 1.5) * s + 2*self.margin
 
     def paper(self):
-        paper = Paper.Paper(self.width(), self.height())
+        paper = Paper.Paper(self.width(), self.height(), marker=self.marker)
         c = paper.canvas
 
         for (row, column), hexag in self.hexags.items():
