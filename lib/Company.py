@@ -6,7 +6,7 @@ import Colour
 import Font
 import Draw
 from Draw import FillStyle, LineStyle, TextStyle
-
+from Token import Token
 
 logo_radius = 5.5*mm
 
@@ -25,9 +25,9 @@ class Company:
         self.num_shares = num_shares
         self.token_costs = token_costs
         if logo:
-            self.logo = self._make_logo_from_image('companies/' + logo, radius=logo_radius, zoom=logo_zoom)
+            self.token = Token(image_file='companies/' + logo, zoom=logo_zoom, background_colour=colour)
         else:
-            self.logo = self._make_logo_from_abbrev(self.abbreviation, radius=logo_radius)
+            self.token = Token(text=abbreviation)
         self.game = None
         self.par_price = par_price
         self.marker = marker
@@ -46,9 +46,10 @@ class Company:
 
         Draw.rectangle(c, (margin, margin), width - 2*margin, height_namebar, FillStyle(self.colour), LineStyle(Colour.black, 1*mm))
         Draw.text(c, (width / 2 + height_tokenbar / 2, margin + height_namebar / 2), self.name,
-                  TextStyle(Font.charter_name, self.colour.contrast_colour, 'center', 'center'))
+                  TextStyle(Font.charter_name.made_to_fit(self.name, c, width - height_tokenbar - 2*margin - 4*mm),
+                            self.colour.contrast_colour, 'center', 'center'))
 
-        self.paint_logo(c, margin + height_namebar/2, margin + height_namebar/2)
+        self.token.draw_black_on_white(c, margin + height_namebar/2, margin + height_namebar/2)
 
         Draw.rectangle(c, (margin, margin), width - 2*margin, height - 2*margin, LineStyle(Colour.black, 1*mm))
 
@@ -79,41 +80,24 @@ class Company:
         return charter
 
     def share_papers(self):
-        yield self._share_paper(percentage=int(100/self.num_shares*2), director=True)
+        yield self.share_paper(percentage=int(100 / self.num_shares * 2), director=True)
 
         for i in range(self.num_shares-2):
-            yield self._share_paper(percentage=int(100/self.num_shares))
+            yield self.share_paper(percentage=int(100 / self.num_shares))
 
-    def _share_paper(self, percentage, director=False):
+    def share_paper(self, percentage, director=False):
         share = Paper.Certificate(colour=self.colour, price=self.par_price, name=self.name, marker=self.marker)
         c = share.canvas
 
-        number_of_shares = 'Two shares' if director else 'One share'
-        Draw.text(c, (19*mm, share.height-3*mm), number_of_shares,
-                  TextStyle(Font.normal, Colour.black, 'bottom', 'left'))
-        Draw.text(c, (share.width-3*mm, share.height-3*mm), f'{percentage}%',
-                  TextStyle(Font.normal, Colour.black, 'bottom', 'right'))
+        if percentage is not None:
+            number_of_shares = 'Two shares' if director else 'One share'
+            Draw.text(c, (19*mm, share.height-3*mm), number_of_shares,
+                      TextStyle(Font.normal, Colour.black, 'bottom', 'left'))
+            Draw.text(c, (share.width-3*mm, share.height-3*mm), f'{percentage}%',
+                      TextStyle(Font.normal, Colour.black, 'bottom', 'right'))
 
-        self.paint_logo(c, 9.5*mm, 11.5*mm)
+        self.token.draw_black_on_white(c, 9.5*mm, 11.5*mm)
         if director:
-            self.paint_logo(c, 9.5*mm, 27.5*mm)
+            self.token.draw_black_on_white(c, 9.5*mm, 27.5*mm)
 
         return share
-
-    def _make_logo_from_image(self, logo_file, radius, zoom=1):
-        return OutputFunctions.put_image_on_token(logo_file, radius, zoom)
-
-    def _make_logo_from_abbrev(self, abbreviation, radius):
-        canvas = Draw.Canvas((0,0), 2*radius, 2*radius)
-        Draw.circle(canvas, (radius, radius), radius, FillStyle(Colour.white))
-        Draw.circle(canvas, (radius, radius), radius*0.9, LineStyle(self.colour, 0.5*mm))
-
-        font = Font.certificate_name.made_to_fit(abbreviation, canvas, radius*1.6)
-
-        Draw.text(canvas, (radius, radius), abbreviation,
-                  TextStyle(font, Colour.black, 'exactcenter', 'exactcenter'))
-
-        return canvas
-
-    def paint_logo(self, canvas, xc, yc):
-        canvas.draw(self.logo, (xc - logo_radius, yc-logo_radius))

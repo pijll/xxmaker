@@ -7,7 +7,7 @@ from Draw import LineStyle, FillStyle, TextStyle
 
 
 class Train:
-    def __init__(self, name, colour, price, image=None, rusted_by=None, exchange_price=None, text=None):
+    def __init__(self, name, colour, price, image=None, rusted_by=None, exchange_price=None, text=None, phase_info=None):
         self.name = name
         self.colour = colour
         self.price = price
@@ -15,6 +15,7 @@ class Train:
         self.rusted_by = rusted_by
         self.exchange_price = exchange_price
         self.text = text
+        self.phase_info = phase_info
 
     def paper(self):
         paper = Paper.Certificate(colour=self.colour, price=self.price)

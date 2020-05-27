@@ -9,6 +9,7 @@ import Paper
 import Font
 import Draw
 from Draw import LineStyle, FillStyle, TextStyle
+from Token import Token
 
 
 class Name:
@@ -100,7 +101,7 @@ class RoundIndicator:
 
 
 def round_indicator_token():
-    return OutputFunctions.put_image_on_token('misc/WingedWheel.png', logo_radius)
+    return Token(image_file='misc/WingedWheel.png')
 
 
 def priority_deal():
@@ -110,35 +111,3 @@ def priority_deal():
                       pd.width-6*mm, pd.height-6*mm)
 
     return pd
-
-
-def trainyard(game, info):
-    train_papers = [train.paper() for _, train in game.trains]
-    height = sum(6*mm + p.height for p in train_papers)
-    width = max(100*mm + p.width for p in train_papers)
-
-    paper = Paper.Paper(width, height)
-    c = paper.canvas
-
-    x = 3*mm
-    y = 3*mm
-    for i, train_paper in enumerate(train_papers):
-        n = game.trains[i][0]
-
-        Draw.text(c, (x, y), f'{n} x', TextStyle(Font.Font(size=9), Colour.black, 'top', 'left'))
-
-        c.draw(train_paper.canvas, (x+10*mm, y), black_and_white=True, alpha=0.5)
-        Draw.rectangle(c, (x+10*mm, y), train_paper.width, train_paper.height, LineStyle(Colour.black, 2))
-
-        if isinstance(info, dict):
-            train_info = info.get(game.trains[i][1].name, '')
-        else:
-            train_info = info[i]
-        for j, txt in enumerate(train_info.split('\n')):
-            Draw.text(c, (x+10*mm+train_paper.width+5*mm, y+j*6*mm), txt, TextStyle(Font.Font(size=9), Colour.black))
-
-        y += train_paper.height + 6*mm
-
-    return paper
-
-

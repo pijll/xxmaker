@@ -11,8 +11,12 @@ class Stockmarket:
     margin = 10*mm
 
     def __init__(self, cells, has_par_box=False):
-        self.has_par_box = has_par_box
         self.game = None
+        self.has_par_box = has_par_box
+        if has_par_box:
+            self.parbox = Parbox(stockmarket=self)
+        else:
+            self.parbox = None
 
         self.cells = dict()
         for i, row in enumerate(cells):
@@ -45,16 +49,28 @@ class Stockmarket:
             cell.draw(c)
 
         if self.current_round_marker:
-            round_surface = self.current_round_marker.draw()
-            c.draw(round_surface, (paper.width - self.margin - round_surface.width,
-                                   paper.height - self.margin - round_surface.height))
+            self.round_surface = self.current_round_marker.draw()
+            c.draw(self.round_surface, (paper.width - self.margin - self.round_surface.width,
+                                        paper.height - self.margin - self.round_surface.height))
+
+        if self.has_par_box:
+            self.parbox.draw(c)
 
         return paper
 
+    def par_values(self):
+        return sorted([cell.value for cell in self.cells.values() if cell.is_par])
+
+    def max_column_in_row(self, row):
+        return max(cell.column for cell in self.cells.values() if cell.row == row)
+
+    def max_row_in_column(self, column):
+        return max(cell.row for cell in self.cells.values() if cell.column == column)
+
 
 class Cell:
-    width = 15 * mm
-    height = 16 * mm
+    width = 19 * mm
+    height = 22 * mm
 
     def __init__(self, row, column, value, stockmarket, colour=None, down_arrow=None, up_arrow=None):
         self.row = row
@@ -65,6 +81,7 @@ class Cell:
         self.down_arrow = down_arrow
         self.up_arrow = up_arrow
         self.is_par = False
+        self.text = None
 
     @property
     def x(self):
@@ -80,7 +97,7 @@ class Cell:
                            FillStyle(self.colour), LineStyle(Colour.black, 1))
         elif self.is_par:
             Draw.rectangle(c, (self.x, self.y), self.width, self.height,
-                           FillStyle(Colour.lightgreen), LineStyle(Colour.black, 1))
+                           FillStyle(Colour.par), LineStyle(Colour.black, 1))
         else:
             Draw.rectangle(c, (self.x, self.y), self.width, self.height,
                            LineStyle(Colour.black, 1))
@@ -90,7 +107,11 @@ class Cell:
                            FillStyle(Colour.white))
 
         text_colour = self.colour.contrast_colour if self.colour else Colour.black
-        Draw.text(c, (self.x+1*mm, self.y+1*mm), self.value, TextStyle(Font.normal, text_colour))
+        Draw.text(c, (self.x+2*mm, self.y+1*mm), self.value, TextStyle(Font.Font(size=10), text_colour))
+
+        if self.text:
+            Draw.text(c, (self.x + self.width - 1*mm, self.y + self.height - 1*mm), self.text,
+                      TextStyle(Font.normal.made_to_fit(self.text, c, self.width-2*mm), text_colour, 'bottom', 'right'))
 
         if self.down_arrow:
             x, y = self.x+2*mm, self.y + self.height - 1*mm
@@ -113,3 +134,51 @@ class Cell:
         for company in sorted(companies, reverse=True):
             Draw.text(c, (self.x+self.width-1*mm, y), company, TextStyle(Font.very_small, Colour.black, 'bottom', 'right'))
             y -= 3*mm
+
+
+class Parbox:
+    margin = 8*mm
+
+    def __init__(self, stockmarket):
+        self.stockmarket = stockmarket
+
+    def draw(self, canvas):
+        left, top = self.location_topleft()
+        right, bottom = self.location_bottomright(canvas)
+
+        width = right - left
+        par_values = self.stockmarket.par_values()
+        cell_width = width / len(par_values)
+
+        if cell_width > 1.5 * Cell.width:
+            cell_width = 1.5 * Cell.width
+            width = len(par_values) * cell_width
+
+        height = bottom - top
+        Draw.rectangle(canvas, (left, top), width, height, LineStyle(Colour.black, 1), FillStyle(Colour.par))
+
+        for i, par in enumerate( par_values):
+            x = left + i * cell_width
+            Draw.rectangle(canvas, (x, top), cell_width, height, LineStyle(Colour.black, 1))
+            Draw.text(canvas, (x+3*mm, top+1*mm), par, TextStyle(Font.Font(size=12), Colour.black))
+
+        # Draw.text(canvas, (right, top), 'Par values', TextStyle(Font.small, Colour.black, 'bottom', 'right'))
+
+    def location_topleft(self):
+        # Determine how much room there is in the last two rows
+        row = self.stockmarket.height - 2
+        column = self.stockmarket.max_column_in_row(row) + 1
+
+        cell = Cell(row, column, None, self.stockmarket)
+        x = cell.x + self.margin
+        y = cell.y + self.margin
+        return x, y
+
+    def location_bottomright(self, canvas):
+        x = canvas.width - self.stockmarket.margin
+        y = canvas.height - self.stockmarket.margin
+
+        if self.stockmarket.current_round_marker:
+            x -= self.stockmarket.round_surface.width + self.margin
+
+        return x, y

@@ -9,7 +9,7 @@ from Draw import LineStyle, FillStyle, TextStyle
 
 
 class Private:
-    colour = Colour.turquoise
+    colour = Colour.private
 
     def __init__(self, name, price, revenue, action_description=None, image=None, location_on_map=None,
                  abbreviation=None):

@@ -59,5 +59,5 @@ class Game:
 
         tokens = []
         for company in self.companies.values():
-            tokens += [company.logo] * (company.n_stations + tokens_per_company)
+            tokens += [company.token] * (company.n_stations + tokens_per_company)
         return tokens + self._tokens

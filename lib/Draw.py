@@ -26,7 +26,7 @@ class Canvas:
 
         self.credits_info = {}
 
-    def draw(self, canvas, location, black_and_white=False, alpha=None, rotated=False):
+    def draw(self, canvas, location, black_and_white=False, alpha=None, rotated=False, colour=None):
         """Paint one canvas on the other, at location x,y = location. (Top right corner)"""
 
         # Copy credits info to this canvas
@@ -38,10 +38,18 @@ class Canvas:
             source_canvas.context.rotate(3.14159 / 2)
             source_canvas.context.set_source_surface(canvas.surface)
             source_canvas.context.paint()
-        else:
-            source_canvas = canvas
+            canvas = source_canvas
 
-        self.context.set_source_surface(source_canvas.surface, *location)
+        if colour:
+            source_canvas = Canvas((0, 0), canvas.height, canvas.width)
+            rectangle(source_canvas, (0, 0), canvas.height, canvas.width, FillStyle(colour))
+
+            source_canvas.context.set_source_surface(canvas.surface, 0, 0)
+            source_canvas.context.set_operator(cairo.OPERATOR_DEST_IN)
+            source_canvas.context.paint()
+            canvas = source_canvas
+
+        self.context.set_source_surface(canvas.surface, *location)
         if alpha is None:
             self.context.paint()
         else:
@@ -50,8 +58,9 @@ class Canvas:
         if black_and_white:
             self.context.set_source_rgba(1, 1, 1)
             self.context.set_operator(cairo.OPERATOR_HSL_COLOR)
-            self.context.rectangle(*location, source_canvas.width, source_canvas.height)
+            self.context.rectangle(*location, canvas.width, canvas.height)
             self.context.fill()
+
 
 
 class Page(Canvas):

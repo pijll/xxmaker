@@ -53,8 +53,8 @@ def load_image(filename, canvas, x_c, y_c, width, height, circle_clip=False):
     context.restore()
 
 
-def put_image_on_token(logo_file, radius, zoom=1):
+def put_image_on_token(logo_file, radius, zoom=1, background_colour=Colour.white):
     canvas = Draw.Canvas((0,0), 2*radius, 2*radius)
-    Draw.circle(canvas, (radius, radius), radius, Draw.FillStyle(Colour.white))
+    Draw.circle(canvas, (radius, radius), radius, Draw.FillStyle(background_colour))
     Draw.load_image(canvas, logo_file, (radius, radius), radius * 1.9, radius * 1.9, zoom=zoom, circle_clip=True)
     return canvas

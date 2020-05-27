@@ -99,13 +99,13 @@ class Output:
         page = self.document.new_page()
 
         # Tokens
-        size = 2*logo_radius + 7*mm
-        number_per_row = self.document.width // size
+        size = 2*logo_radius + 4*mm
+        number_per_row = self.document.width // size - 2
 
         for i, token in enumerate(self.game.tokens):
             x = self.margin + (i % number_per_row) * size
             y = self.margin + (i // number_per_row) * size
-            page.draw(token, (x, y))
+            page.draw(token.draw_sticker(), (x, y))
 
         self.create_credits_page()
         self.document.finish()
