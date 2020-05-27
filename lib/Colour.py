@@ -6,7 +6,8 @@ alias = {
     'phase_2': 'green',
     'phase_3': 'russet',
     'phase_4': 'grey',
-    'par': 'lightgreen'
+    'par': 'lightgreen',
+    'background': 'white'
 }
 
 
@@ -85,3 +86,4 @@ phase_3 = Colour('phase_3')
 phase_4 = Colour('phase_4')
 par = Colour('par')
 private = Colour('private')
+background = Colour('background')

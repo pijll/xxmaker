@@ -1,10 +1,12 @@
 import unittest
 import Colour
+import Palette
 
 
 class TestColour(unittest.TestCase):
     def test_colour(self):
         # ARRANGE
+        Colour.Colour.palette = Palette.default
 
         # ACT
         colour = Colour.white
@@ -14,6 +16,7 @@ class TestColour(unittest.TestCase):
 
     def test_rgb_of_colour(self):
         # ARRANGE
+        Colour.Colour.palette = Palette.default
         red = Colour.red
 
         # ACT
@@ -26,6 +29,7 @@ class TestColour(unittest.TestCase):
 
     def test_faded(self):
         # ARRANGE
+        Colour.Colour.palette = Palette.default
         red = Colour.red
 
         # ACT
@@ -39,6 +43,7 @@ class TestColour(unittest.TestCase):
 
     def test_alias(self):
         # ARRANGE
+        Colour.Colour.palette = Palette.default
         phase1 = Colour.phase_1
 
         # ACT

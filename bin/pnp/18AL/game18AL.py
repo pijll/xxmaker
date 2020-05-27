@@ -1,3 +1,5 @@
+import os
+
 import Game
 import Company
 import Misc
@@ -24,7 +26,8 @@ def create_18al(outfile='18AL'):
     Colour.alias['par'] = 'grey'
     Colour.alias['private'] = 'lightblue'
 
-    game = Game.Game(name="18AL", author='Mark Derrick', credits_file='credits.txt')
+    credits_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'credits.txt')
+    game = Game.Game(name="18AL", author='Mark Derrick', credits_file=credits_file)
 
     abc = Company.Company(name="Atlanta, Birmingham & Coast", abbreviation="ABC",
                           colour=Colour.yellow, logo='free/Atlanta_Birmingham_Coast.svg',

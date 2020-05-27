@@ -33,7 +33,7 @@ class AllGames(unittest.TestCase):
             pass
 
         # act
-        game18AL.create_18AL()
+        game18AL.create_18al()
 
         # assert
         self.assertTrue(os.path.isfile('18AL.pdf'))
