@@ -1,5 +1,6 @@
 bin/nonfree
-lib/__pycache__
+xxmaker/game/nonfree
+__pycache__
 graphics/companies/nonfree
 venv
 .idea
