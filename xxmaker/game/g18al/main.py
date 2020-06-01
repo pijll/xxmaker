@@ -3,7 +3,8 @@ import os
 from gamepart import *
 import Output
 import Colour
-from gamepart.Hexag import Connect, Label
+from gamepart.Hexag import Label
+from gamepart.Connect import Connect
 from gamepart.City import City, Town, TripleCity
 import Palette
 from gamepart.IPO import IPO

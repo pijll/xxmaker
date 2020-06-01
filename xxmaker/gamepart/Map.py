@@ -32,7 +32,7 @@ class Map:
         self.marker = marker
 
     def add_hexag(self, coords=None, row=None, column=None, hexag=None):
-        hexag = hexag or Hexag.empty()
+        hexag = hexag or Hexag.empty
         if coords:
             row, column = self.coords_to_rowcolumn(coords)
         self.hexags[row, column] = hexag
@@ -68,9 +68,14 @@ class Map:
         paper = Paper.Paper(self.width(), self.height(), marker=self.marker)
         c = paper.canvas
 
+        if self.background:
+            Draw.load_image_with_scale(paper.canvas, self.background, self.background_scale, self.background_xy)
+
         for (row, column), hexag in self.hexags.items():
             x, y = self.position_of_hexag(row, column)
-            paper.canvas.draw(hexag.draw(), (int(x), y))
+            if self.background and hexag.colour == Colour.background:
+                hexag.alpha = 0.6
+            hexag.draw_on_canvas(paper.canvas, (int(x), y))
 
         for hexag in self.hexags.values():
             for border in hexag.borders:
@@ -104,18 +109,6 @@ class Map:
                 raise ValueError(location)
 
             paper.canvas.draw(canvas, (x, y))
-
-        # if self.background:
-        #     try:
-        #         image = cairo.ImageSurface.create_from_png(self.background)
-        #
-        #         c.save()
-        #         c.scale(self.background_scale, self.background_scale)
-        #         c.set_source_surface(image, *self.background_xy)
-        #         c.paint_with_alpha(0.6)
-        #
-        #     except cairo.Error:
-        #         print(f'{cairo.Error}, filename={self.background}')
 
         return paper
 

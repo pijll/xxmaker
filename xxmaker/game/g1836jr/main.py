@@ -2,7 +2,8 @@ from gamepart import *
 
 import Output
 import Colour
-from gamepart.Hexag import Connect, Hill, Water, Hexag as Hex, Border
+from gamepart.Hexag import Hill, Water, Hexag as Hex, Border
+from gamepart.Connect import Connect
 from gamepart.City import City, Town
 from Definitions import *
 import os

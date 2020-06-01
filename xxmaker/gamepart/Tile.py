@@ -3,7 +3,8 @@ from Definitions import *
 from math import sqrt
 from .City import Town, City, DoubleCity, TripleCity, QuadCity, Value
 from . import Hexag
-from .Hexag import Connect, WhiteTrack, DottedTrack, Label
+from .Hexag import WhiteTrack, DottedTrack, Label
+from .Connect import Connect
 import Font
 from graphics.cairo import Draw
 from graphics.cairo.Draw import TextStyle

@@ -142,18 +142,22 @@ class LineStyle:
 
 
 class FillStyle:
-    def __init__(self, colour):
+    def __init__(self, colour, alpha=None):
         self.colour = colour
+        self.alpha = alpha
 
 
 def _draw(canvas, styles):
     context = canvas.context
 
     for i, style in enumerate(styles):
-        laatste_argument = (i == len(styles) - 1)
+        last_argument = (i == len(styles) - 1)
         if isinstance(style, FillStyle):
-            context.set_source_rgb(*style.colour.rgb)
-            if laatste_argument:
+            if style.alpha is not None:
+                context.set_source_rgba(*style.colour.rgb, style.alpha)
+            else:
+                context.set_source_rgb(*style.colour.rgb)
+            if last_argument:
                 context.fill()
             else:
                 context.fill_preserve()
@@ -170,7 +174,7 @@ def _draw(canvas, styles):
                 context.set_dash([1*mm])
             if style.end_cap == end_cap_round:
                 context.set_line_cap(cairo.LineCap.ROUND)
-            if laatste_argument:
+            if last_argument:
                 context.stroke()
             else:
                 context.stroke_preserve()
@@ -303,6 +307,40 @@ def load_image(canvas, filename, center, width, height, zoom=1, circle_clip=Fals
     if circle_clip:
         context.arc(center[0]/scale, center[1]/scale, max(img_width, img_height)/2/zoom, 0, 6.29)
         context.clip()
+    context.paint()
+    context.restore()
+    return True
+
+
+def load_image_with_scale(canvas, filename, scale, location):
+    """Filename should be relative to the graphics directory."""
+    this_file = pathlib.Path(__file__)
+    image_dir = this_file.parents[3] / 'graphics'
+    complete_filename = str(image_dir / filename)
+
+    if complete_filename.endswith('.svg'):
+        filename_png = convert_svg_to_png(complete_filename)
+    else:
+        filename_png = complete_filename
+    try:
+        image = cairo.ImageSurface.create_from_png(filename_png)
+    except cairo.Error:
+        print(f'{cairo.Error}, filename={filename}')
+        return False
+
+    credits_file = complete_filename + '.txt'
+    try:
+        with open(credits_file) as infile:
+            credits_txt = infile.read()
+    except OSError:
+        raise Exception(f"No credits file found for file '{filename}' ({credits_file})") from None
+
+    canvas.credits_info[filename] = credits_txt
+
+    context = canvas.context
+    context.save()
+    context.scale(scale, scale)
+    context.set_source_surface(image, *location)
     context.paint()
     context.restore()
     return True

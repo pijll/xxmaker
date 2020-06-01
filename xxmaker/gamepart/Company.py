@@ -4,7 +4,7 @@ import Colour
 import Font
 from graphics.cairo import Draw
 from graphics.cairo.Draw import FillStyle, LineStyle, TextStyle
-from .Token import Token
+from .Token import Token, TokenWithText
 
 logo_radius = 5.5*mm
 
@@ -25,7 +25,7 @@ class Company:
         if logo:
             self.token = Token(image_file='companies/' + logo, zoom=logo_zoom, background_colour=colour)
         else:
-            self.token = Token(text=abbreviation)
+            self.token = TokenWithText(text=abbreviation, colour=colour)
         self.game = None
         self.par_price = par_price
         self.marker = marker
@@ -46,7 +46,7 @@ class Company:
                   TextStyle(Font.charter_name.made_to_fit(self.name, c, width - height_tokenbar - 2*margin - 4*mm),
                             self.colour.contrast_colour, 'center', 'center'))
 
-        self.token.draw_black_on_white(c, margin + height_namebar/2, margin + height_namebar/2)
+        self.token.draw_on_white_background(c, margin + height_namebar / 2, margin + height_namebar / 2)
 
         Draw.rectangle(c, (margin, margin), width - 2*margin, height - 2*margin, LineStyle(Colour.black, 1*mm))
 
@@ -93,8 +93,8 @@ class Company:
             Draw.text(c, (share.width-3*mm, share.height-3*mm), f'{percentage}%',
                       TextStyle(Font.normal, Colour.black, 'bottom', 'right'))
 
-        self.token.draw_black_on_white(c, 9.5*mm, 11.5*mm)
+        self.token.draw_on_white_background(c, 9.5 * mm, 11.5 * mm)
         if director:
-            self.token.draw_black_on_white(c, 9.5*mm, 27.5*mm)
+            self.token.draw_on_white_background(c, 9.5 * mm, 27.5 * mm)
 
         return share

@@ -113,7 +113,7 @@ class Output:
         page = self.document.new_page()
         x = self.margin
         y = self.margin
-        for credits_txt in [self.game.credits] + list(self.document.credits_info.values()):
+        for credits_txt in [self.game.credits, ''] + list(self.document.credits_info.values()):
             for line_of_text in credits_txt.split('\n'):
                 Draw.text(page, (x, y), line_of_text, TextStyle(Font.small, Colour.black))
                 y += 3*mm

@@ -7,7 +7,7 @@ from . import Paper
 import Font
 from graphics.cairo import Draw
 from graphics.cairo.Draw import LineStyle, FillStyle, TextStyle
-from .Token import Token
+from . import Token
 
 
 class Name:
@@ -99,7 +99,7 @@ class RoundIndicator:
 
 
 def round_indicator_token():
-    return Token(image_file='misc/WingedWheel.png')
+    return Token.TokenWithImage(image='misc/WingedWheel.png')
 
 
 def priority_deal():

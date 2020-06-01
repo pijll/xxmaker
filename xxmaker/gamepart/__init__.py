@@ -1,5 +1,6 @@
 from . import City
 from . import Company
+from . import Connect
 from . import Game
 from . import Hexag
 from . import IPO

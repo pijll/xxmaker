@@ -8,7 +8,7 @@ alias = {
     'phase_4': 'grey',
     'par': 'lightgreen',
     'private': 'lightblue',
-    'background': 'white'
+    'background': 'lightgreen'
 }
 
 
@@ -55,8 +55,26 @@ class Colour:
             return white
 
     # TODO
-    def faded(self, factor=0.1):
+    def faded(self, factor=0.2):
         return Colour(name=self.name, fade_factor=factor)
+
+
+class ColourRgb(Colour):
+    def __init__(self, r, g, b):
+        super().__init__(name='({},{},{})'.format(r, g, b))
+        self.r = r
+        self.g = g
+        self.b = b
+
+    @property
+    def rgb(self):
+        return self.r, self.g, self.b
+
+    def faded(self, factor=0.2):
+        r = self.r * factor + 1 - factor
+        g = self.g * factor + 1 - factor
+        b = self.b * factor + 1 - factor
+        return ColourRgb(r, g, b)
 
 
 transparent = Colour('transparent')

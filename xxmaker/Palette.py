@@ -60,18 +60,27 @@ xxpaper = Palette({
 
 })
 
+# These colours have been taken from a screen grab of the 18AL files
+# at http://www.diogenes.sacramento.ca.us/18AL_18GA.html
 galt_18al = Palette({
     'white': (1, 1, 1),
     'black': (0, 0, 0),
-    'yellow': (1, .96, 0),      # fff500
-    'green': (.33, .85, .17),   # 54d92b
-    'russet': (.67, .45, .16),  # ab7329
-    'grey': (.75, .75, .75),    # bfbfbf
+    'yellow': (1, .96, 0),          # fff500
+    'green': (.33, .85, .17),       # 54d92b
+    'russet': (.67, .45, .16),      # ab7329
+    'grey': (.75, .75, .75),        # bfbfbf
 
-    'pink': (.8, .2, .4),       # cc3366
-    'purple': (.6, .4, .8),     # 9966cc
-    'turquoise': (.2, 1, .8),   # 33ffcc
-    'orange': (.94, .61, .29),  # f09c4a
-    'blue': (0, .58, .87),      # 0094de
-    'lightblue': (.46, .77, .94) # 75c4f0
+    'red': (.87, .11, 0),           # dd1b01
+
+    'pink': (.8, .2, .4),           # cc3366
+    'purple': (.6, .4, .8),         # 9966cc
+    'turquoise': (.2, 1, .8),       # 33ffcc
+    'orange': (.94, .61, .29),      # f09c4a
+    'blue': (0, .58, .87),          # 0094de
+    'lightblue': (.46, .77, .94),   # 75c4f0
+    'lightgreen': (.6, 8, .59),     # 99cd97
+
+    # The following colours do not come from the 18AL files
+    #'brown': (.8, .51, .18),
+    'brown': (.67, .45, .16),
 })

@@ -1,3 +1,4 @@
+import gamepart.Connect
 from gamepart import *
 import Output
 from gamepart import Misc
@@ -123,20 +124,20 @@ def create_1800(output_file='1800'):
 
     game.add_paper(Misc.priority_deal(), Trainyard.Trainyard(game))
 
-    Tile.Tile(800, Colour.phase_2, Town('A', value=30), Hexag.Connect(SW, NE), Hexag.Connect(S, 'A'),
-              Hexag.Connect(SE, 'A'), label='D&SL', label_location=(-0.3, -0.5))
-    Tile.Tile(802, Colour.phase_2, Hexag.Connect(S, N, DoubleCity('A', value=40, name='Denver', name_location=(-0.5, 0.45))),
-              Hexag.Connect(NW, 'A'), Hexag.Connect(NE, 'A'))
-    Tile.Tile(803, Colour.phase_3, Hexag.Connect(S, N, DoubleCity('A', value=50, name='Denver', name_location=(-0.5, 0.45))),
-              Hexag.Connect(NW, 'A'), Hexag.Connect(NE, 'A'))
-    Tile.Tile(804, Colour.phase_3, City('A', value=40), Hexag.Connect('A', N),
-              Hexag.Connect(NW, 'A'), Hexag.Connect(NE, 'A'))
-    Tile.Tile(805, Colour.phase_4, Hexag.Connect(S, N, DoubleCity('A', value=60, name='Denver', name_location=(-0.5, 0.45))),
-              Hexag.Connect(NW, 'A'), Hexag.Connect(NE, 'A'))
-    Tile.Tile(806, Colour.phase_4, Town('A', value=10), Hexag.Connect(SW, NE), Hexag.Connect(S, 'A'))
-    Tile.Tile(807, Colour.phase_4, Town('A', value=10), Hexag.Connect(SW, NE), Hexag.Connect(SE, 'A'))
-    Tile.Tile(808, Colour.phase_4, Town('A', value=10), Hexag.Connect(SW, 'A'), Hexag.Connect(SE, 'A'),
-              Hexag.Connect(S, 'A'))
+    Tile.Tile(800, Colour.phase_2, Town('A', value=30), gamepart.Connect.Connect(SW, NE), gamepart.Connect.Connect(S, 'A'),
+              gamepart.Connect.Connect(SE, 'A'), label='D&SL', label_location=(-0.3, -0.5))
+    Tile.Tile(802, Colour.phase_2, gamepart.Connect.Connect(S, N, DoubleCity('A', value=40, name='Denver', name_location=(-0.5, 0.45))),
+              gamepart.Connect.Connect(NW, 'A'), gamepart.Connect.Connect(NE, 'A'))
+    Tile.Tile(803, Colour.phase_3, gamepart.Connect.Connect(S, N, DoubleCity('A', value=50, name='Denver', name_location=(-0.5, 0.45))),
+              gamepart.Connect.Connect(NW, 'A'), gamepart.Connect.Connect(NE, 'A'))
+    Tile.Tile(804, Colour.phase_3, City('A', value=40), gamepart.Connect.Connect('A', N),
+              gamepart.Connect.Connect(NW, 'A'), gamepart.Connect.Connect(NE, 'A'))
+    Tile.Tile(805, Colour.phase_4, gamepart.Connect.Connect(S, N, DoubleCity('A', value=60, name='Denver', name_location=(-0.5, 0.45))),
+              gamepart.Connect.Connect(NW, 'A'), gamepart.Connect.Connect(NE, 'A'))
+    Tile.Tile(806, Colour.phase_4, Town('A', value=10), gamepart.Connect.Connect(SW, NE), gamepart.Connect.Connect(S, 'A'))
+    Tile.Tile(807, Colour.phase_4, Town('A', value=10), gamepart.Connect.Connect(SW, NE), gamepart.Connect.Connect(SE, 'A'))
+    Tile.Tile(808, Colour.phase_4, Town('A', value=10), gamepart.Connect.Connect(SW, 'A'), gamepart.Connect.Connect(SE, 'A'),
+              gamepart.Connect.Connect(S, 'A'))
 
     tiles_numbers = [3, 4, 4, 5, 5, 6, 6, 7, 8, 8, 9, 9, 12, 12, 16, 18, 19, 23, 24, 25, 26, 27, 28, 29,
                      39, 40, 41, 42, 43, 45, 46, 58, 58, 59, 64, 65, 67, 68, 70, 800, 802, 803, 804, 805, 806, 807, 808]
@@ -148,8 +149,8 @@ def create_1800(output_file='1800'):
             print(f"OOPS tile {t}")
 
     # replacement tile for 3-player expansion
-    Tile.Tile(802, Colour.phase_2, Hexag.Connect(S, N, DoubleCity('A', value=40, name='Denver', name_location=(-0.5, 0.45), companies=[cm])),
-              Hexag.Connect(NW, 'A'), Hexag.Connect(NE, 'A'))
+    Tile.Tile(802, Colour.phase_2, gamepart.Connect.Connect(S, N, DoubleCity('A', value=40, name='Denver', name_location=(-0.5, 0.45), companies=[cm])),
+              gamepart.Connect.Connect(NW, 'A'), gamepart.Connect.Connect(NE, 'A'))
 
     tiles_numbers_3players = [5, 6, 12, 15, 802, 804]
 

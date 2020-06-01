@@ -2,7 +2,8 @@ from gamepart import *
 from graphics.cairo import Draw
 from graphics.cairo.Draw import LineStyle, TextStyle
 import Colour
-from gamepart.Hexag import Hill, Water, Hexag as Hex, Connect
+from gamepart.Hexag import Hill, Water, Hexag as Hex
+from gamepart.Connect import Connect
 from gamepart.City import City, Town
 from Definitions import *
 import os

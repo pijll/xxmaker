@@ -2,7 +2,8 @@ import Output
 import Colour
 
 from gamepart import *
-from gamepart.Hexag import Connect, Hill, Hexag as Hex, WhiteTrack, DottedTrack, Border
+from gamepart.Hexag import Hill, Hexag as Hex, WhiteTrack, DottedTrack, Border
+from gamepart.Connect import Connect
 from gamepart.City import City, Town, DoubleCity, Port
 from Definitions import *
 from gamepart import Misc
